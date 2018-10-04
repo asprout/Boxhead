@@ -5,9 +5,9 @@ Project repository for HRI project in Intelligent Robotics Lab
 ### 10/12
   - [x] Submit IRB
   - [ ] Finalize task measures
+  - [ ] Formalize unique robot identities for conditions
   - [ ] Code
     - [ ] Robot introduction
-    - [ ] "unique" identity for the robot
 ### 11/02
   - [ ] Code
     - [ ] Control behaviors
