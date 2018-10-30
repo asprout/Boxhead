@@ -2,6 +2,8 @@ package com.example.android.boxhead
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
 import com.jibo.apptoolkit.protocol.CommandLibrary
 import com.jibo.apptoolkit.protocol.OnConnectionListener
 import com.jibo.apptoolkit.protocol.model.EventMessage
@@ -9,9 +11,12 @@ import com.jibo.apptoolkit.android.JiboRemoteControl
 import com.jibo.apptoolkit.android.model.api.Robot
 import java.io.InputStream
 import android.widget.Toast
+import com.example.android.boxhead.R.id.inputName
+import com.example.android.boxhead.R.id.inputPID
 import com.jibo.apptoolkit.protocol.model.Command
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.ArrayList
+import java.util.*
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.OnCommandResponseListener {
 
@@ -19,6 +24,14 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
     private var mCommandLibrary: CommandLibrary? = null
     // List of robots associated with a user's account
     private var mRobots: ArrayList<Robot>? = null
+    private var myBotNum: Int = 0
+    // Variable to time Jibo's screen display
+    private var displayTimer: CountDownTimer? = object : CountDownTimer(8000, 1000) {
+        override fun onFinish() { // after some time of displaying text, display the eye again
+            mCommandLibrary?.display(Command.DisplayRequest.EyeView("eye"), null)
+        }
+        override fun onTick(millisUntilFinished: Long) {}
+    }
 
     // Variables for the experiment
     private var pid: Int? = null
@@ -35,13 +48,18 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
             // Print a list of all robots associated with the account and their index in the array
             // so we can choose the one we want to connect to
             var i = 0
-            var botList = "";
+            var botList = ""
             while (i < mRobots!!.size) {
-                botList += i.toString() + ": " + mRobots!!.get(i).getRobotName() + "\n"
+                botList += i.toString() + ": " + mRobots!!.get(i).robotName + "\n"
+                if (mRobots!!.get(i).robotName == "Chrome-Data-Pitaya-Calico") {
+                    myBotNum = i
+                    log("Chrome found")
+                }
                 i++
             }
 
             Toast.makeText(this@MainActivity, botList, Toast.LENGTH_SHORT).show()
+            log(botList)
 
             // Disable Log In and enable Connect and Log Out buttons when authenticated
             buttonLogin?.isEnabled = false
@@ -98,7 +116,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         // To connect to a different robot, replace `0` in the code below with the index
         // printed on-screen next to the correct robot name
         else {
-            var myBot = mRobots!![0]
+            var myBot = mRobots!![myBotNum]
             JiboRemoteControl.instance.connect(myBot, this)
         }
 
@@ -162,6 +180,20 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         }
     }
 
+    /* BACKGROUND ACTIVITY FUNCTION (occurs every 10 seconds) */
+    inner class BackgroundActivity : TimerTask() {
+
+        override fun run() {
+            runOnUiThread {
+                if (mCommandLibrary != null) {
+                    if (radioExperimental.isChecked)
+                        glanceBehavior(15)
+                    esmlPassive(50)
+                    passiveMovement(50)
+                }
+            }
+        }
+    }
 
     // Say Hello World
     fun onSubmitClick() {
@@ -169,9 +201,107 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         pidName = inputName.text?.toString()
         pid = inputPID.text?.toString()?.toInt()
 
+        if (mCommandLibrary != null && pidName != null && pid != null ) {
+            displayText("Hi " + pidName + ". Please confirm your ID: " + pid)
+        }
+
+        /*
+        val testvals = listOf(-4, -3, -2, -1, 0, 1, 2, 3, 4)
+        for (i in testvals.indices){
+            for (j in testvals.indices) {
+                displayText("Position: " + testvals[i] + ", " + testvals[j])
+                onMoveClick(intArrayOf(testvals[i], testvals[j], 1))
+                Thread.sleep(2000)
+            }
+        }*/
+
+        // start running the background activity
+        val backgroundTimer = Timer()
+        backgroundTimer.schedule(BackgroundActivity(), 6000, 6000)
+    }
+
+    /* Project-specific functions */
+
+    private fun log(msg: String) {
+        Log.d("Boxhead", msg)
+    }
+
+    private fun onMoveClick(position: IntArray) : String? { // moves based on given position
+        if (mCommandLibrary != null){
+            return mCommandLibrary?.lookAt(Command.LookAtRequest.PositionTarget(position), this)
+        }
+        return null
+    }
+    private fun passiveMovement(prob : Int){
+        if (Math.random() * 100 > prob)
+            return
+        val movevals = listOf(-4, -3, -2, -1, 0, 1, 2, 3, 4)
+        if (radioControl.isChecked){
+            onMoveClick(intArrayOf(movevals[(Math.random() * 5).toInt()], movevals[(Math.random() * 8).toInt()], 1))
+        } else {
+            onMoveClick(intArrayOf(movevals[(Math.random() * 5 + 4).toInt()], movevals[(Math.random() * 8).toInt()], 1))
+        }
+    }
+
+    private fun esmlPassive(prob: Int) {
         if (mCommandLibrary != null) {
-            val displayText = Command.DisplayRequest.TextView("display", pidName)
-            mCommandLibrary?.display(displayText, this)
+            if (Math.random() * 100 < prob) {
+                val rand = Math.random() * 100
+                var text = "<anim cat='laughing' endNeutral='true' layers='body'/>"
+                when{
+                    rand < 16 -> text = "<anim cat='frustrated' endNeutral='true' layers='body'/>"
+                    rand < 32 -> text = "<anim cat='affection' endNeutral='true' layers='body'/>"
+                    rand < 48 -> text = "<anim cat='relieved' endNeutral='true' layers='body'/>"
+                    rand < 64 -> text = "<anim cat='happy' endNeutral='true' layers='body'/>"
+                    rand < 70 -> text = "<anim cat='excited' endNeutral='true' layers='body'/>"
+                }
+                mCommandLibrary?.say(text, this)
+                log("Passive behavior: $text")
+            }
+        }
+    }
+
+    private fun glanceBehavior(prob: Int){
+        if (Math.random() * 100 < prob) {
+            log("Glancing behavior activated")
+            val returnPos = intArrayOf(2, -1, 1)
+            onMoveClick(returnPos)
+            val glanceTimer = object : CountDownTimer( 5000, 1000) {
+                override fun onFinish() { onMoveClick(returnPos) ; log("Glance completed; now looking back.") }
+                override fun onTick(millisUntilFinished: Long) {
+                    if ((millisUntilFinished/1000).toInt() == 2)
+                        log("Performing glance")
+                        onMoveClick(intArrayOf(3, 1, 1))
+                }
+            }
+            glanceTimer.start()
+        }
+    }
+
+    private fun displayText(text: String){
+        if (mCommandLibrary != null){
+            val displayText = text.replace("(.{40,}? )".toRegex(), "$1\n")
+            val toDisplay = Command.DisplayRequest.TextView("display", displayText)
+            mCommandLibrary?.display(toDisplay, this)
+            displayTimer?.cancel()
+            displayTimer?.start() // start timer for when to display the eye again
+            log("Displayed: $text")
+        }
+    }
+
+    private fun say(text : String?) : String? {
+        if (mCommandLibrary != null && text != null && text != "") {
+            log("Said: $text")
+            return mCommandLibrary?.say(text, this)
+        } else if (text != null)
+            log("Say() not executed for: '" + text.substring(0, minOf(text.length, 40)) + "...'")
+        return null
+    }
+
+    // Interact Button
+    private fun onInteractClick() {
+        if (mCommandLibrary != null) {
+            return
         }
     }
 
