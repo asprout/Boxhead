@@ -29,8 +29,8 @@
         android:id="@+id/buttonConnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="225dp"
         android:text="Connect"
-        app:layout_constraintEnd_toStartOf="@+id/buttonDisconnect"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
 
@@ -38,9 +38,11 @@
         android:id="@+id/buttonDisconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="108dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:text="Disconnect"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/buttonConnect"
         app:layout_constraintTop_toBottomOf="@+id/buttonLogout" />
 
     <EditText
@@ -55,7 +57,6 @@
         android:inputType="number"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputName" />
 
@@ -63,24 +64,23 @@
         android:id="@+id/inputName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="136dp"
+        android:layout_marginTop="44dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonConnect" />
+        app:layout_constraintTop_toBottomOf="@+id/radioCondition" />
 
     <RadioGroup
         android:id="@+id/radioCondition"
         android:layout_width="250dp"
         android:layout_height="50dp"
         android:layout_marginBottom="36dp"
-        android:checkedButton="@+id/radioControl"
+        android:checkedButton="@+id/radioExperimental"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/inputName"
+        app:layout_constraintTop_toBottomOf="@+id/buttonConnect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -89,15 +89,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Group C"
+            android:text="Group A"
             android:textAlignment="center" />
 
         <RadioButton
             android:id="@+id/radioExperimental"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Group E"
+            android:text="Group B"
             android:textAlignment="center" />
 
     </RadioGroup>
@@ -109,11 +109,99 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="Submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputPID" />
+
+    <EditText
+        android:id="@+id/sayText"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Enter text for Jibo to say"
+        android:inputType="textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSubmit" />
+
+    <EditText
+        android:id="@+id/moveX"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="225dp"
+        android:ems="10"
+        android:hint="X"
+        android:inputType="numberSigned"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSpeak" />
+
+    <EditText
+        android:id="@+id/moveY"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Y"
+        android:inputType="numberSigned"
+        app:layout_constraintStart_toEndOf="@+id/moveX"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSpeak" />
+
+    <EditText
+        android:id="@+id/moveZ"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Z"
+        android:inputType="numberSigned"
+        app:layout_constraintStart_toEndOf="@+id/moveY"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSpeak" />
+
+    <Button
+        android:id="@+id/buttonSpeak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Speak"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sayText" />
+
+    <Button
+        android:id="@+id/buttonMove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Move"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/moveZ"
+        app:layout_constraintTop_toBottomOf="@+id/buttonSpeak" />
+
+    <ToggleButton
+        android:id="@+id/buttonBegin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Start"
+        android:textOff="Begin"
+        android:textOn="End"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputPID"
-        app:layout_constraintVertical_bias="0.06" />
+        app:layout_constraintTop_toBottomOf="@+id/moveZ"
+        app:layout_constraintVertical_bias="0.806" />
 
 
 </android.support.constraint.ConstraintLayout>

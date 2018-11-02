@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
     // List of robots associated with a user's account
     private var mRobots: ArrayList<Robot>? = null
     private var myBotNum: Int = 0
+    // Times last Jibo movement
+    private var lastMoveTime: Long = 0
     // Variable to time Jibo's screen display
     private var displayTimer: CountDownTimer? = object : CountDownTimer(8000, 1000) {
         override fun onFinish() { // after some time of displaying text, display the eye again
@@ -88,8 +90,10 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         buttonLogin.setOnClickListener { onLoginClick() }
         buttonConnect.setOnClickListener { onConnectClick() }
         buttonDisconnect.setOnClickListener { onDisconnectClick() }
-        buttonLogout.setOnClickListener{ onLogOutClick() }
-        buttonSubmit.setOnClickListener{ onSubmitClick() }
+        buttonLogout.setOnClickListener { onLogOutClick() }
+        buttonSubmit.setOnClickListener { onSubmitClick() }
+        buttonMove.setOnClickListener { onMoveClick() }
+        buttonSpeak.setOnClickListener { onSpeakClick() }
 
         // Start with only the Log In button enabled
         buttonLogin.isEnabled = true
@@ -158,6 +162,9 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
             // Log that we're connected to the app
             Toast.makeText(this@MainActivity, "Connected", Toast.LENGTH_SHORT).show()
         }
+        // start running the background activity
+        val backgroundTimer = Timer()
+        backgroundTimer.schedule(BackgroundActivity(), 6000, 6000)
     }
 
     override fun onConnectionFailed(throwable: Throwable) {
@@ -185,7 +192,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
 
         override fun run() {
             runOnUiThread {
-                if (mCommandLibrary != null) {
+                if (mCommandLibrary != null && buttonBegin.isChecked) {
                     if (radioExperimental.isChecked)
                         glanceBehavior(15)
                     esmlPassive(50)
@@ -198,11 +205,14 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
     // Say Hello World
     fun onSubmitClick() {
         // Assign variables
-        pidName = inputName.text?.toString()
-        pid = inputPID.text?.toString()?.toInt()
 
-        if (mCommandLibrary != null && pidName != null && pid != null ) {
+        if (mCommandLibrary != null && inputName.text != null && inputPID.text != null ) {
+            pidName = inputName.text.toString()
+            if (pidName == "" || inputPID.text?.toString() == "")
+                return
+            pid = inputPID.text.toString()?.toInt()
             displayText("Hi " + pidName + ". Please confirm your ID: " + pid)
+            log("Displayed: Hi " + pidName + ". Please confirm your ID:" + pid)
         }
 
         /*
@@ -214,10 +224,6 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
                 Thread.sleep(2000)
             }
         }*/
-
-        // start running the background activity
-        val backgroundTimer = Timer()
-        backgroundTimer.schedule(BackgroundActivity(), 6000, 6000)
     }
 
     /* Project-specific functions */
@@ -226,14 +232,37 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         Log.d("Boxhead", msg)
     }
 
+    private fun onSpeakClick() : String? {
+        if (sayText.text != null)
+            return say(sayText.text?.toString())
+        return null
+    }
+
+    private fun onMoveClick() : String? {
+        val posX = moveX.text.toString()
+        val posY = moveY.text.toString()
+        val posZ = moveZ.text.toString()
+        if (posX != "" && posY != "" && posZ != "")
+            return onMoveClick(intArrayOf(posX.toInt(), posY.toInt(), posZ.toInt()))
+
+        return null
+    }
+
     private fun onMoveClick(position: IntArray) : String? { // moves based on given position
         if (mCommandLibrary != null){
+            lastMoveTime = System.currentTimeMillis()
             return mCommandLibrary?.lookAt(Command.LookAtRequest.PositionTarget(position), this)
         }
         return null
     }
+
+    private fun canMove() : Boolean {
+        if (System.currentTimeMillis() - lastMoveTime > 2000) return true
+        return false
+    }
+
     private fun passiveMovement(prob : Int){
-        if (Math.random() * 100 > prob)
+        if (Math.random() * 100 > prob || !canMove())
             return
         val movevals = listOf(-4, -3, -2, -1, 0, 1, 2, 3, 4)
         if (radioControl.isChecked){
@@ -245,7 +274,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
 
     private fun esmlPassive(prob: Int) {
         if (mCommandLibrary != null) {
-            if (Math.random() * 100 < prob) {
+            if (Math.random() * 100 < prob && canMove()) {
                 val rand = Math.random() * 100
                 var text = "<anim cat='laughing' endNeutral='true' layers='body'/>"
                 when{
@@ -255,6 +284,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
                     rand < 64 -> text = "<anim cat='happy' endNeutral='true' layers='body'/>"
                     rand < 70 -> text = "<anim cat='excited' endNeutral='true' layers='body'/>"
                 }
+                lastMoveTime = System.currentTimeMillis()
                 mCommandLibrary?.say(text, this)
                 log("Passive behavior: $text")
             }
