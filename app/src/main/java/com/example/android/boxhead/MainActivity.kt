@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
                 return
             pid = inputPID.text.toString()?.toInt()
             displayText("Hi " + pidName + ". Please confirm your ID: " + pid)
-            log("Displayed: Hi " + pidName + ". Please confirm your ID:" + pid)
+            log("Submit button clicked.")
         }
 
         /*
@@ -243,6 +243,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         val posY = moveY.text.toString()
         val posZ = moveZ.text.toString()
         if (posX != "" && posY != "" && posZ != "")
+            log("Moving to position: " + posX + " " + posY + " " + posZ)
             return onMoveClick(intArrayOf(posX.toInt(), posY.toInt(), posZ.toInt()))
 
         return null
@@ -251,6 +252,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
     private fun onMoveClick(position: IntArray) : String? { // moves based on given position
         if (mCommandLibrary != null){
             lastMoveTime = System.currentTimeMillis()
+            log("Moving to position: " + position[0] + " " + position[1] + " " + position[2])
             return mCommandLibrary?.lookAt(Command.LookAtRequest.PositionTarget(position), this)
         }
         return null
@@ -265,6 +267,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         if (Math.random() * 100 > prob || !canMove())
             return
         val movevals = listOf(-4, -3, -2, -1, 0, 1, 2, 3, 4)
+        log("Performing passive movement")
         if (radioControl.isChecked){
             onMoveClick(intArrayOf(movevals[(Math.random() * 5).toInt()], movevals[(Math.random() * 8).toInt()], 1))
         } else {
@@ -286,7 +289,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
                 }
                 lastMoveTime = System.currentTimeMillis()
                 mCommandLibrary?.say(text, this)
-                log("Passive behavior: $text")
+                log("Passive ESML behavior: $text")
             }
         }
     }
