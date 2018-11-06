@@ -1,8 +1,7 @@
+# encoding=utf-8
 from psychopy import core, visual, gui, data, event
 from psychopy.tools.filetools import fromFile, toFile
 import numpy, random
-
-import paired_association_exp
 
 # global variables
 
@@ -18,7 +17,7 @@ else:
     core.quit()  # the user hit cancel so exit
 
 # setting up the window and clocks
-win = visual.Window([1300,750],allowGUI=True,
+win = visual.Window(allowGUI=True, fullscr=True, 
                         monitor='testMonitor', units='deg')
 globalClock = core.Clock()
 trialClock = core.Clock()
@@ -28,10 +27,10 @@ trialClock = core.Clock()
 # paired assocation task:
 # # # # # # # # # # # # #
 
-easy_cues      = ["か", "さ", "た",  "な", "は", "ま", "や", "ら",  "わ"]
+easy_cues      = [u"か", u"さ", u"た",  u"な", u"は", u"ま", u"や", u"ら",  u"わ"]
 easy_responses = ["ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"]
 
-hard_cues      = ["うえ", "した",   "ひと",  "つき",    "やま",    "かわ",  "いす",  "かお",  "くち"]
+hard_cues      = [u"うえ", u"した", u"ひと", u"つき", u"やま", u"かわ", u"いす", u"かお", u"くち"]
 hard_responses = ["up", "down", "person", "moon", "mountain", "river", "chair", "face", "mouth"]
 
 def pa_getInput(cue, response, same):
@@ -290,10 +289,10 @@ def wa_experiment():
     globalClock.reset()
     
     exp_letter = 'a'
-    trial_time = 60
+    trial_time = 30
     
     for stimulus in hard_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 2."+exp_letter+"\n\nIn this task, you will be presented with a stimulus word and you will need to write verbs related to that stimulus. Your answers must be single words, with no hyphens, and composed entirely of letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress any key to continue")
+        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 2."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress any key to continue")
         instruction_message.draw()
         win.flip()
         exp_letter = chr(ord(exp_letter) + 1)
@@ -306,7 +305,7 @@ def wa_experiment():
             dataFile.write('%s,%s,%.3f\n' %(stimulus, output[0], output[1]))
     
     for stimulus in easy_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 2."+exp_letter+"\n\nIn this task, you will be presented with a stimulus word and you will need to write verbs related to that stimulus. Your answers must be single words, with no hyphens, and composed entirely of letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress any key to continue")
+        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 2."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress any key to continue")
         instruction_message.draw()
         win.flip()
         exp_letter = chr(ord(exp_letter) + 1)
@@ -424,9 +423,8 @@ def rc_experiment():
     win.flip()
     
     event.waitKeys()
-    
 
-    hard_article = '''
+    hard_article = u'''
 The field of Human–Robot Collaboration (HRC) is tasked with designing proactive and autonomous robot collaborators able to complement the superior capabilities of human workers to maximize throughput, improve safety of the workplace, and reduce cognitive load on humans. The general application domain for HRC is composed of a robot that collaborates with humans on a joint task such as furniture  assembly, assembly lines, or other factory-related applications. However, state of the art technologies still rely on sterile and rigid interactions that resort to turn-taking behaviors, tele-operation, or more generally limited autonomy and decision making capabilities. 
 
 Conversely, human–human interaction (HHI) during teamwork does not show this friction. Fluent and natural HHIs are multimodal, highly contextual and situated. This is particularly true when coordination during teamwork is at tended through natural language. Humans resolve the natural ambiguities of speech by integrating verbal with non-verbal cues and, importantly, by grounding speech to the physical domain of the interaction—e.g. through implicature or lexical entrainment. 
@@ -434,7 +432,7 @@ Conversely, human–human interaction (HHI) during teamwork does not show this f
 Yet, despite evidence of the importance of situated natural language in HHI, achieving the same level of richness still represents a significant challenge for HRI in general and HRC in particular. Reasons for this are specific to HRC, e.g. the presence of noise in environments such as those commonly found in factories. Noisy environments may result in failure to recognize significant portions of an utterance—if not the totality of it. This not only leads to erroneous naming of specific actions and objects, but also makes the structure of sentences harder to parse by natural language understanding (NLU) algorithms that exploit syntax. Most notably, impediments to deploying effective HRC interactions are also to be found in the very nature of the communication itself. Communication during collaboration often occurs in a time constrained context, is highly goal-oriented, typically requires a high success rate in order to be effective, is domain-dependent, and often features mutual adaptation between peers. The time constraint during collaboration pressures agents to make shorter utterances that might not be well-formed sentences; the noise and the need for unambiguity favor some classes of words over others, often resulting in a highly domain-specific language. All these factors greatly hamper the deployment of standard NLU techniques to HRC. State-of-the-art technologies resort extensively to hand-coded domain knowledge, or require training on large datasets most of which are taken from descriptive text and are borrowed from different contexts that do not necessarily leverage the specific domain knowledge. Still, to achieve the level of fluency seen in HHIs, a core ability of future generations of robots will be for them to collaborate withhumans through the situated interactions with which humans are most comfortable. 
     '''
     
-    easy_article = '''
+    easy_article = u'''
 In an effort to minimize injury and let carpenters focus on design and other bigger-picture tasks, a team from MIT's Computer Science and Artificial Intelligence Laboratory (CSAIL) has created AutoSaw, a system that lets you customize different items that can then be constructed with the help of robots.
 
 Users can choose from a range of carpenter-designed templates for chairs, desks and other furniture -- and eventually could use AutoSaw for projects as large as a deck or a porch.
