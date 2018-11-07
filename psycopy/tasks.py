@@ -6,7 +6,7 @@ import numpy, random
 # global variables
 
 # experiment info initialization
-expInfo = {'participant':''}
+expInfo = {'participant':'','group':'','id':''}
 expInfo['dateStr'] = data.getDateStr()  # add the current time
 
 # present a dialogue to change params
@@ -83,7 +83,7 @@ def pa_train(cues, responses):
     # number of times each pair is shown
     num_trainings = 3
     # number of seconds each pair is shown
-    time_per_pair = 0.5
+    time_per_pair = 1
     
     for j in range(num_trainings):
         # randomize order of cues each time
@@ -127,14 +127,14 @@ def pa_trial(cues, responses, i):
         
     return (cue, inputs[1], correctness)
     
-def pa_experiment():
+def pa_experiment(task_num):
     # make a text file to save data
     fileName = expInfo['participant'] + '_pa_'+ expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile.write('cue,time,correctness\n')
     
     # Task description: training
-    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 1.a\n\nIn this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues.\n\nPress the 'enter' key to continue")
+    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+".a\n\nIn this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues.\n\nPress the 'enter' key to continue")
     instruction_message.draw()
     win.flip()
     
@@ -154,7 +154,7 @@ def pa_experiment():
         dataFile.write('%i,%.3f,%s\n' %(i, output[1], output[2]))
 #        dataFile.write('%s,%.3f,%s\n' %(output[0], output[1], output[2])) # unicode issue
         
-    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 1.b\n\nIn this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues.\n\nPress the 'enter' key to continue")
+    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+".b\n\nIn this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues.\n\nPress the 'enter' key to continue")
     instruction_message.draw()
     win.flip()
     
@@ -180,6 +180,8 @@ def pa_experiment():
 # # # # # # # # # # # # #
 easy_stimuli = ["rope", "ball", "wheel"]
 hard_stimuli = ["kite", "scissors", "projector"]
+#easy_stimuli = ["rope", "ball"]
+#hard_stimuli = ["kite", "scissors"]
 counter = core.CountdownTimer()
 
 def oa_getInput(image):
@@ -290,7 +292,7 @@ def wa_getInput(stimulus):
 
     return (word, trialTime)
 
-def wa_experiment():
+def wa_experiment(task_num):
     # make a text file to save data
     fileName = expInfo['participant'] + '_wa_' + expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
@@ -302,7 +304,7 @@ def wa_experiment():
     trial_time = 30
     
     for stimulus in hard_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 2."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'enter' key to continue")
+        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'enter' key to continue")
         instruction_message.draw()
         win.flip()
         exp_letter = chr(ord(exp_letter) + 1)
@@ -315,7 +317,7 @@ def wa_experiment():
             dataFile.write('%s,%s,%.3f\n' %(stimulus, output[0], output[1]))
     
     for stimulus in easy_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task 2."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'enter' key to continue")
+        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'enter' key to continue")
         instruction_message.draw()
         win.flip()
         exp_letter = chr(ord(exp_letter) + 1)
@@ -421,7 +423,7 @@ def multipleChoice(question, answers, correct_answer):
     
     return (correctness, trialTime)
 
-def rc_experiment():
+def rc_experiment(task_num):
     # make a text file to save data
     fileName1 = expInfo['participant'] + '_rc1_' + expInfo['dateStr']
     fileName2 = expInfo['participant'] + '_rc2_' + expInfo['dateStr']
@@ -429,7 +431,7 @@ def rc_experiment():
     dataFile1 = open(fileName1+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile1.write('article,time\n')
 
-    question_message = visual.TextStim(win, font="Georgia", text="Task 3\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Georgia", text="Task " + task_num + "\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'enter' key to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -516,10 +518,75 @@ The paper, which will be presented in May at the International Conference on Rob
     dataFile1.close()
     dataFile2.close()
 
+exp_intro_message = u'''
+For this experiment, you will be working with Jibo, a small tabletop social robot. 
+
+Jibo’s “loop” is a group of people Jibo can recognize by face and voice, and is who Jibo considers his family. To get started, please take a few minutes to add yourself to Jibo’s loop. [INSTRUCTIONS TO ADD TO JIBO’S LOOP?] 
+
+If you need assistance at any time during this or any later parts of the experiment, please feel free to ask the experimenter.'''
+
+con_intro_message = u'''
+For this experiment, you will be using Jibo, a small tabletop robot that can be programmed to move and speak, among other abilities. To get started, please take a few minutes to familiarize yourself with some simple Jibo commands on the tablet provided. 
+
+Until told to, please do not click the “Begin” button on the tablet.
+
+First, enter your name (or nickname) and given participant ID. Note that your name will not be associated with your PID or any performance measures when we perform the experimental analysis. Afterwards, feel free to experiment with the “Speak” and “Move” buttons until time is over. We suggest trying to move Jibo in various directions.
+
+When it is time to move on, future instructions will be displayed on this screen.'''
+
+pre_task_message = u'''
+In this part of the experiment, you will complete a series of pre-tasks that we will use as baseline performance measures. You will not need Jibo or the tablet for this part of the experiment. Please click the “Begin” button on Jibo when you are ready to start, and then move on to the next page.'''
+
 def main():
-    pa_experiment()
-    wa_experiment()
-    rc_experiment()
+    # print out the correct introductory page for each setting
+    if (expInfo['group'] in ['a', 'A']):
+        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.5)
+        introduction_message.draw()
+        win.flip()
+        waitForEnter()
+    else:
+        introduction_message = visual.TextStim(win, font="Courier", text=con_intro_message, height=0.5)
+        introduction_message.draw()
+        win.flip()
+        waitForEnter()
+        
+    introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'enter' key when you are ready to continue", height=0.8)
+    introduction_message.draw()
+    win.flip()
+    waitForEnter()
+    
+    participant_id = int(expInfo['id'])
+    counterbalance_id = participant_id % 6
+    if (counterbalance_id == 0): # pa, wa, rc
+#        print("pa, wa, rc")
+        pa_experiment('1')
+        wa_experiment('2')
+        rc_experiment('3')
+    elif (counterbalance_id == 1): # pa, rc, wa
+#        print("pa, rc, wa")
+        pa_experiment('1')
+        rc_experiment('2')
+        wa_experiment('3')
+    elif (counterbalance_id == 2): # wa, pa, rc
+#        print("wa, pa, rc")
+        wa_experiment('1')
+        pa_experiment('2')
+        rc_experiment('3')
+    elif (counterbalance_id == 3): # wa, rc, pa
+#        print("wa, rc, pa")
+        wa_experiment('1')
+        rc_experiment('2')
+        pa_experiment('3')
+    elif (counterbalance_id == 4): # rc, pa, wa
+#        print("rc, pa, wa")
+        rc_experiment('1')
+        pa_experiment('2')
+        wa_experiment('3')
+    else: # rc, wa, pa
+#        print("rc, wa, pa")
+        rc_experiment('1')
+        wa_experiment('2')
+        pa_experiment('3')
     
     win.close()
     core.quit()
