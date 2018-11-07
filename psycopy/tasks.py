@@ -37,11 +37,15 @@ def waitForEnter():
 # paired assocation task:
 # # # # # # # # # # # # #
 
-easy_cues      = [u"か", u"さ", u"た",  u"な", u"は", u"ま", u"や", u"ら",  u"わ"]
-easy_responses = ["ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"]
+#easy_cues      = [u"か", u"さ", u"た",  u"な", u"は", u"ま", u"や", u"ら",  u"わ"]
+#easy_responses = ["ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"]
 
-hard_cues      = [u"うえ", u"した", u"ひと", u"つき", u"やま", u"かわ", u"いす", u"かお", u"くち"]
-hard_responses = ["up", "down", "person", "moon", "mountain", "river", "chair", "face", "mouth"]
+#hard_cues      = [u"うえ", u"した", u"ひと", u"つき", u"やま", u"かわ", u"いす", u"かお", u"くち"]
+#hard_responses = ["up", "down", "person", "moon", "mountain", "river", "chair", "face", "mouth"]
+
+cues           = [u"うえ", u"した", u"ひと",  u"つき",  u"やま",     u"かわ", u"いす",  u"かお", u"くち",  u"みみ", u"あし", u"あめ", u"こえ",  u"えき",    u"いま", u"なか",   u"そと",    u"あさ",   u"よる",  u"ねこ", u"くも",  u"あめ", u"かさ",    u"ちず"]
+hard_responses = ["ue",   "shita", "hito",  "tsuki", "yama",     "kawa",  "isu",   "kao",   "kuchi", "mimi", "ashi", "ame",   "koe",   "eki",     "ima",   "naka",   "soto",    "asa",     "yoru",  "neko",  "kumo",  "ame",  "kasa",    "chizu"]
+easy_responses = ["up",   "down", "person", "moon",  "mountain", "river", "chair", "face",  "mouth", "ear",  "feet", "candy", "voice", "station", "now",   "inside", "outside", "morning", "night", "cat",   "cloud", "rain", "umbrella", "map"]
 
 def pa_getInput(cue, response, same):
     # get input from user
@@ -140,7 +144,7 @@ def pa_experiment(task_num):
     
     waitForEnter()
 
-    pa_train(hard_cues, hard_responses)
+    pa_train(cues, hard_responses)
     
     # Task description: testing
     instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Now you will be presented with a pair of a cue and response. If the correct response is listed for that given cue, click the 'up' arrow. Else, click the 'down' arrow if you think the incorrect reponse is listen for the given cue.\n\nPress the 'enter' key to continue ")
@@ -149,8 +153,8 @@ def pa_experiment(task_num):
     
     waitForEnter()
 
-    for i in range(len(hard_cues)):
-        output = pa_trial(hard_cues, hard_responses, i)
+    for i in range(len(cues)):
+        output = pa_trial(cues, hard_responses, i)
         dataFile.write('%i,%.3f,%s\n' %(i, output[1], output[2]))
 #        dataFile.write('%s,%.3f,%s\n' %(output[0], output[1], output[2])) # unicode issue
         
@@ -160,7 +164,7 @@ def pa_experiment(task_num):
     
     waitForEnter()
         
-    pa_train(easy_cues, easy_responses)
+    pa_train(cues, easy_responses)
     
     instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Now you will be presented with a pair of a cue and response. If the correct response is listed for that given cue, click the 'up' arrow. Else, click the 'down' arrow if you think the incorrect reponse is listen for the given cue.\n\nPress the 'enter' key to continue ")
     instruction_message.draw()
@@ -168,8 +172,8 @@ def pa_experiment(task_num):
     
     waitForEnter()
     
-    for i in range(len(easy_cues)):
-        output = pa_trial(easy_cues, easy_responses, i)
+    for i in range(len(cues)):
+        output = pa_trial(cues, easy_responses, i)
         dataFile.write('%i,%.3f,%s\n' %(i, output[1], output[2]))
 #        dataFile.write('%s,%.3f,%s\n' %(output[0], output[1], output[2]))
         
