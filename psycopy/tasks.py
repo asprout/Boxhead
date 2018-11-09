@@ -23,15 +23,22 @@ globalClock = core.Clock()
 trialClock = core.Clock()
 
 # wait for enter function
-def waitForEnter():
+def waitForRight():
     thisResp = None
     while thisResp == None:
         allKeys=event.waitKeys()
         for thisKey in allKeys:
-            if thisKey == 'return':
+            if thisKey == 'right':
                 thisResp = True
         event.clearEvents()
 
+def display_and_wait(string):
+    # Task description: training
+    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text=string)
+    instruction_message.draw()
+    win.flip()
+    
+    waitForRight()
 
 # # # # # # # # # # # # #
 # paired assocation task:
@@ -63,12 +70,12 @@ def pa_getInput(cue, response, same):
     while thisResp==None:
         allKeys=event.waitKeys()
         for thisKey in allKeys:
-            if thisKey=='up':
+            if thisKey=='f':
                 if same:
                     thisResp = 1 # correct
                 else:
                     thisResp = -1 # incorrect
-            elif thisKey=='down':
+            elif thisKey=='j':
                 if same:
                     thisResp = -1 # incorrect
                 else:
@@ -131,51 +138,53 @@ def pa_trial(cues, responses, i):
         
     return (cue, inputs[1], correctness)
     
+pa_training_instructions = "In this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues. \n\nIn this first part, you will be presented with cue and response pairs. You will be presented with each pair 3 times, and there will be 8 words. The training will take about 30 seconds. \n\nPress the 'right' arrow to continue"
+
+pa_training_instructions = "Now you will be presented with a pair of a cue and response. If the correct response is listed for that given cue, click the 'f' key. Else, click the 'j' key if you think the incorrect reponse is listed for the given cue.\n\nPress the 'right' arrow to continue"
+
 def pa_experiment(task_num):
     # make a text file to save data
     fileName = expInfo['id'] + '_pa_'+ expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile.write('cue,time,correctness\n')
-    
-    # Task description: training
-    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+".a\n\nIn this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues.\n\nPress the 'enter' key to continue")
-    instruction_message.draw()
-    win.flip()
-    
-    waitForEnter()
 
-    pa_train(cues, hard_responses)
-    
-    # Task description: testing
-    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Now you will be presented with a pair of a cue and response. If the correct response is listed for that given cue, click the 'up' arrow. Else, click the 'down' arrow if you think the incorrect reponse is listen for the given cue.\n\nPress the 'enter' key to continue ")
-    instruction_message.draw()
-    win.flip()
-    
-    waitForEnter()
+    # hard tasks
+    # Right now 3 trials of 8 pairs
+    for i in range(3):
+        # list slice to get one third of the cues/responses
+        trial_cues = cues[i*8:(i+1)*8]
+        trial_responses = hard_responses[i*8:(i+1)*8]
 
-    for i in range(len(cues)):
-        output = pa_trial(cues, hard_responses, i)
-        dataFile.write('%i,%.3f,%s\n' %(i, output[1], output[2]))
-#        dataFile.write('%s,%.3f,%s\n' %(output[0], output[1], output[2])) # unicode issue
-        
-    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+".b\n\nIn this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues.\n\nPress the 'enter' key to continue")
-    instruction_message.draw()
-    win.flip()
+        # Task description: training
+        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Training\n\n" + pa_training_instructions)
+
+        pa_train(trial_cues, trial_responses)
     
-    waitForEnter()
-        
-    pa_train(cues, easy_responses)
+        # Task description: testing
+        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Testing\n\n" + pa_training_instructions)
+
+        for cue in range(len(trial_cues)):
+            output = pa_trial(trial_cues, trial_responses, cue)
+            dataFile.write('%i,%.3f,%s\n' %(cue, output[1], output[2]))
+
+    # easy tasks
+    # Right now 3 trials of 8 pairs
+    for i in range(3):
+        # list slice to get one third of the cues/responses
+        trial_cues = cues[i*8:(i+1)*8]
+        trial_responses = easy_responses[i*8:(i+1)*8]
+
+        # Task description: training
+        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Training\n\n" + pa_training_instructions)
+
+        pa_train(trial_cues, trial_responses)
     
-    instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Now you will be presented with a pair of a cue and response. If the correct response is listed for that given cue, click the 'up' arrow. Else, click the 'down' arrow if you think the incorrect reponse is listen for the given cue.\n\nPress the 'enter' key to continue ")
-    instruction_message.draw()
-    win.flip()
-    
-    waitForEnter()
-    
-    for i in range(len(cues)):
-        output = pa_trial(cues, easy_responses, i)
-        dataFile.write('%i,%.3f,%s\n' %(i, output[1], output[2]))
-#        dataFile.write('%s,%.3f,%s\n' %(output[0], output[1], output[2]))
+        # Task description: testing
+        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Testing\n\n" + pa_training_instructions)
+
+        for cue in range(len(trial_cues)):
+            output = pa_trial(trial_cues, trial_responses, cue)
+            dataFile.write('%i,%.3f,%s\n' %(cue, output[1], output[2]))
         
     dataFile.close()
 
@@ -308,11 +317,11 @@ def wa_experiment(task_num):
     trial_time = 30
     
     for stimulus in hard_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'enter' key to continue")
+        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type. You will have 30 seconds to write as many verbs as you can.\n\nPress the 'right' arrow to continue")
         instruction_message.draw()
         win.flip()
         exp_letter = chr(ord(exp_letter) + 1)
-        waitForEnter()
+        waitForRight()
         
         counter.reset(trial_time)
         while (counter.getTime() > 0):
@@ -321,11 +330,11 @@ def wa_experiment(task_num):
             dataFile.write('%s,%s,%.3f\n' %(stimulus, output[0], output[1]))
     
     for stimulus in easy_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'enter' key to continue")
+        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'right' arrow after each word you type.\n\nPress the 'right' arrow to continue")
         instruction_message.draw()
         win.flip()
         exp_letter = chr(ord(exp_letter) + 1)
-        waitForEnter()
+        waitForRight()
         
         counter.reset(trial_time)
         while (counter.getTime() > 0):
@@ -435,12 +444,12 @@ def rc_experiment(task_num):
     dataFile1 = open(fileName1+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile1.write('article,time\n')
 
-    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'right' arrow to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
     
-    waitForEnter()
+    waitForRight()
 
     hard_article = u'''
 The field of Human–Robot Collaboration (HRC) is tasked with designing proactive and autonomous robot collaborators able to complement the superior capabilities of human workers to maximize throughput, improve safety of the workplace, and reduce cognitive load on humans. The general application domain for HRC is composed of a robot that collaborates with humans on a joint task such as furniture  assembly, assembly lines, or other factory-related applications. However, state of the art technologies still rely on sterile and rigid interactions that resort to turn-taking behaviors, tele-operation, or more generally limited autonomy and decision making capabilities. 
@@ -464,21 +473,21 @@ The system also gives general users more flexibility in designing furniture to b
 The paper, which will be presented in May at the International Conference on Robotics and Automation (ICRA) in Brisbane, Australia, was co-written by Lipton, Rus and PhD student Adriana Schulz. Other co-authors include MIT professor Wojciech Matusik, PhD student Andrew Spielberg and undergraduate Luis Trueba.
     '''
     
-    question_message = visual.TextStim(win, font="Courier", text="Article 1\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Article 1\n\nPress the 'right' arrow to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
     
-    waitForEnter()
+    waitForRight()
 
     rc_train(hard_article, "hard", dataFile1)
     
-    question_message = visual.TextStim(win, font="Courier", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'right' arrow to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
     
-    waitForEnter()
+    waitForRight()
     
     dataFile2 = open(fileName2+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile2.write('time,correctness\n')
@@ -498,12 +507,12 @@ The paper, which will be presented in May at the International Conference on Rob
                                                         
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
-    question_message = visual.TextStim(win, font="Courier", text="Article 2\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Article 2\n\nPress the 'right' arrow to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
     
-    waitForEnter()
+    waitForRight()
     
     rc_train(easy_article, "easy", dataFile1)
     
@@ -512,7 +521,7 @@ The paper, which will be presented in May at the International Conference on Rob
 
     win.flip()
     
-    waitForEnter()
+    waitForRight()
     
     output = multipleChoice("Where was the AutoSaw technology developed?", 
                             ["Stanford","Caltech", "MIT", "Harvard", "Yale"], "c")
@@ -557,7 +566,7 @@ def main():
         introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)
         introduction_message.draw()
         win.flip()
-        waitForEnter()
+        waitForRight()
     else: # control
         timer = core.CountdownTimer()
         timer.reset(180)
@@ -570,10 +579,10 @@ def main():
             introduction_message.draw()
             win.flip()
         
-    introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'enter' key when you are ready to continue", height=0.8)
+    introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'right' arrow when you are ready to continue", height=0.8)
     introduction_message.draw()
     win.flip()
-    waitForEnter()
+    waitForRight()
     
     participant_id = int(expInfo['id'])
     counterbalance_id = participant_id % 6
@@ -611,7 +620,7 @@ def main():
     introduction_message = visual.TextStim(win, font="Courier", text="You finished the pre-task! Please let an experimenter know that you have finished!")
     introduction_message.draw()
     win.flip()
-    waitForEnter()
+    waitForRight()
 
     
     win.close()
