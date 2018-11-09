@@ -543,16 +543,22 @@ In this part of the experiment, you will complete a series of pre-tasks that we 
 
 def main():
     # print out the correct introductory page for each setting
-    if (expInfo['group'] in ['a', 'A']):
+    if (expInfo['group'] in ['a', 'A']): # experimental
         introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.5)
         introduction_message.draw()
         win.flip()
         waitForEnter()
-    else:
-        introduction_message = visual.TextStim(win, font="Courier", text=con_intro_message, height=0.5)
-        introduction_message.draw()
-        win.flip()
-        waitForEnter()
+    else: # control
+        timer = core.CountdownTimer()
+        timer.reset(300)
+        
+        while (timer.getTime() > 0):
+            timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])
+            timer_stim.draw()
+            
+            introduction_message = visual.TextStim(win, font="Courier", text=con_intro_message, height=0.5)
+            introduction_message.draw()
+            win.flip()
         
     introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'enter' key when you are ready to continue", height=0.8)
     introduction_message.draw()
