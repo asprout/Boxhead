@@ -6,7 +6,7 @@ import numpy, random
 # global variables
 
 # experiment info initialization
-expInfo = {'participant':'','group':'','id':''}
+expInfo = {'group':'','id':''}
 expInfo['dateStr'] = data.getDateStr()  # add the current time
 
 # present a dialogue to change params
@@ -133,7 +133,7 @@ def pa_trial(cues, responses, i):
     
 def pa_experiment(task_num):
     # make a text file to save data
-    fileName = expInfo['participant'] + '_pa_'+ expInfo['dateStr']
+    fileName = expInfo['id'] + '_pa_'+ expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile.write('cue,time,correctness\n')
     
@@ -298,7 +298,7 @@ def wa_getInput(stimulus):
 
 def wa_experiment(task_num):
     # make a text file to save data
-    fileName = expInfo['participant'] + '_wa_' + expInfo['dateStr']
+    fileName = expInfo['id'] + '_wa_' + expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile.write('stimulus,response,time\n')
 
@@ -393,7 +393,7 @@ def rc_train(article, article_type, dataFile):
 def multipleChoice(question, answers, correct_answer):
     trialClock.reset()
     
-    question_message = visual.TextStim(win, font="Georgia", text=question, pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text=question, pos=(0,4))
     question_message.draw()
     
     letter = "a"
@@ -402,7 +402,7 @@ def multipleChoice(question, answers, correct_answer):
     for answer in answers:
         letters.append(letter)
         numeration = letter + ") "
-        answer_message = visual.TextStim(win, font="Georgia", text=numeration+answer, pos=(-5,answer_height), alignHoriz="left")
+        answer_message = visual.TextStim(win, font="Courier", text=numeration+answer, pos=(-5,answer_height), alignHoriz="left")
         answer_message.draw()
         answer_height -= 1.2
         letter = chr(ord(letter) + 1)
@@ -429,13 +429,13 @@ def multipleChoice(question, answers, correct_answer):
 
 def rc_experiment(task_num):
     # make a text file to save data
-    fileName1 = expInfo['participant'] + '_rc1_' + expInfo['dateStr']
-    fileName2 = expInfo['participant'] + '_rc2_' + expInfo['dateStr']
+    fileName1 = expInfo['id'] + '_rc1_' + expInfo['dateStr']
+    fileName2 = expInfo['id'] + '_rc2_' + expInfo['dateStr']
     
     dataFile1 = open(fileName1+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile1.write('article,time\n')
 
-    question_message = visual.TextStim(win, font="Georgia", text="Task " + task_num + "\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'enter' key to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -447,7 +447,7 @@ The field of Human–Robot Collaboration (HRC) is tasked with designing proactiv
 
 Conversely, human–human interaction (HHI) during teamwork does not show this friction. Fluent and natural HHIs are multimodal, highly contextual and situated. This is particularly true when coordination during teamwork is at tended through natural language. Humans resolve the natural ambiguities of speech by integrating verbal with non-verbal cues and, importantly, by grounding speech to the physical domain of the interaction—e.g. through implicature or lexical entrainment. 
 
-Yet, despite evidence of the importance of situated natural language in HHI, achieving the same level of richness still represents a significant challenge for HRI in general and HRC in particular. Reasons for this are specific to HRC, e.g. the presence of noise in environments such as those commonly found in factories. Noisy environments may result in failure to recognize significant portions of an utterance—if not the totality of it. This not only leads to erroneous naming of specific actions and objects, but also makes the structure of sentences harder to parse by natural language understanding (NLU) algorithms that exploit syntax. Most notably, impediments to deploying effective HRC interactions are also to be found in the very nature of the communication itself. Communication during collaboration often occurs in a time constrained context, is highly goal-oriented, typically requires a high success rate in order to be effective, is domain-dependent, and often features mutual adaptation between peers. The time constraint during collaboration pressures agents to make shorter utterances that might not be well-formed sentences; the noise and the need for unambiguity favor some classes of words over others, often resulting in a highly domain-specific language. All these factors greatly hamper the deployment of standard NLU techniques to HRC. State-of-the-art technologies resort extensively to hand-coded domain knowledge, or require training on large datasets most of which are taken from descriptive text and are borrowed from different contexts that do not necessarily leverage the specific domain knowledge. Still, to achieve the level of fluency seen in HHIs, a core ability of future generations of robots will be for them to collaborate withhumans through the situated interactions with which humans are most comfortable. 
+Yet, despite evidence of the importance of situated natural language in HHI, achieving the same level of richness still represents a significant challenge for HRI in general and HRC in particular. Reasons for this are specific to HRC, e.g. the presence of noise in environments such as those commonly found in factories. Noisy environments may result in failure to recognize significant portions of an utterance—if not the totality of it. This not only leads to erroneous naming of specific actions and objects, but also makes the structure of sentences harder to parse by natural language understanding (NLU) algorithms that exploit syntax. Most notably, impediments to deploying effective HRC interactions are also to be found in the very nature of the communication itself. Communication during collaboration often occurs in a time constrained context, is highly goal-oriented, typically requires a high success rate in order to be effective, is domain-dependent, and often features mutual adaptation between peers. The time constraint during collaboration pressures agents to make shorter utterances that might not be well-formed sentences; the noise and the need for unambiguity favor some classes of words over others, often resulting in a highly domain-specific language. All these factors greatly hamper the deployment of standard NLU techniques to HRC. State-of-the-art technologies resort extensively to hand-coded domain knowledge, or require training on large datasets most of which are taken from descriptive text and are borrowed from different contexts that do not necessarily leverage the specific domain knowledge. Still, to achieve the level of fluency seen in HHIs, a core ability of future generations of robots will be for them to collaborate with humans through the situated interactions with which humans are most comfortable. 
     '''
     
     easy_article = u'''
@@ -464,7 +464,7 @@ The system also gives general users more flexibility in designing furniture to b
 The paper, which will be presented in May at the International Conference on Robotics and Automation (ICRA) in Brisbane, Australia, was co-written by Lipton, Rus and PhD student Adriana Schulz. Other co-authors include MIT professor Wojciech Matusik, PhD student Andrew Spielberg and undergraduate Luis Trueba.
     '''
     
-    question_message = visual.TextStim(win, font="Georgia", text="Article 1\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Article 1\n\nPress the 'enter' key to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -473,7 +473,7 @@ The paper, which will be presented in May at the International Conference on Rob
 
     rc_train(hard_article, "hard", dataFile1)
     
-    question_message = visual.TextStim(win, font="Georgia", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'enter' key to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'enter' key to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -485,15 +485,20 @@ The paper, which will be presented in May at the International Conference on Rob
     
     output = multipleChoice("Which of the above is not cited by the article an example of the joint tasks that humans can do with robots?", 
                             ["Furniture assembly","Assembly lines","Food preparation"], "c")
-                            
-    dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
-                            
-    output = multipleChoice("What do humans use to resolve the natural ambiguities of speech?", 
-                            ["Non-verbal cues","Implicature","Written instructions","a & b only", "All of the above"], "d")
-                            
+                                                      
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
-    question_message = visual.TextStim(win, font="Georgia", text="Article 2\n\nPress the 'enter' key to continue", pos=(0,4))
+    output = multipleChoice("Which of the above is not cited by the article an example of how robot collaborators can benefit humans?", 
+                            ["Maximize throughput","Improve safety", "Improve quality", "Reduce cognitive load"], "c")
+                                                        
+    dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
+                            
+    output = multipleChoice("Which of the following are cited by the article an ways that humans resolve the natural ambiguities of speech?", 
+                            ["Non-verbal cues","Implicature","Lexcial entrainment","a & b only", "All of the above"], "e")
+                                                        
+    dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
+    
+    question_message = visual.TextStim(win, font="Courier", text="Article 2\n\nPress the 'enter' key to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -502,7 +507,7 @@ The paper, which will be presented in May at the International Conference on Rob
     
     rc_train(easy_article, "easy", dataFile1)
     
-    question_message = visual.TextStim(win, font="Georgia", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'enter' to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'enter' to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -515,7 +520,12 @@ The paper, which will be presented in May at the International Conference on Rob
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
                             
     output = multipleChoice("How did the authors avoid having the user put their hand near the blades?", 
-                            ["Automated process","Planning algorithms for cuts","Deep learning of common cuts"], "a")
+                            ["Automated process","Planning algorithms","Deep learning of cuts"], "a")
+                            
+    dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
+    
+    output = multipleChoice("What do the authors say that technologies like AutoSaw will enable?", 
+                            ["Mass production","Mass customization","Mass recycling", "Mass Organization"], "b")
                             
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
@@ -525,7 +535,7 @@ The paper, which will be presented in May at the International Conference on Rob
 exp_intro_message = u'''
 For this experiment, you will be working with Jibo, a small tabletop social robot. 
 
-Jibo’s “loop” is a group of people Jibo can recognize by face and voice, and is who Jibo considers his family. To get started, please take a few minutes to add yourself to Jibo’s loop. [INSTRUCTIONS TO ADD TO JIBO’S LOOP?] 
+Jibo’s “loop” is a group of people Jibo can recognize by face and voice, and is who Jibo considers his family. To get started, please take a few minutes to add yourself to Jibo’s loop. The experimenter will help you add yourself to the loop.
 
 If you need assistance at any time during this or any later parts of the experiment, please feel free to ask the experimenter.'''
 
@@ -543,14 +553,14 @@ In this part of the experiment, you will complete a series of pre-tasks that we 
 
 def main():
     # print out the correct introductory page for each setting
-    if (expInfo['group'] in ['a', 'A']): # experimental
-        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.5)
+    if (expInfo['group'] in ['b', 'B']): # experimental
+        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)
         introduction_message.draw()
         win.flip()
         waitForEnter()
     else: # control
         timer = core.CountdownTimer()
-        timer.reset(300)
+        timer.reset(180)
         
         while (timer.getTime() > 0):
             timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])
@@ -597,6 +607,12 @@ def main():
         rc_experiment('1')
         wa_experiment('2')
         pa_experiment('3')
+    
+    introduction_message = visual.TextStim(win, font="Courier", text="You finished the pre-task! Please let an experimenter know that you have finished!")
+    introduction_message.draw()
+    win.flip()
+    waitForEnter()
+
     
     win.close()
     core.quit()
