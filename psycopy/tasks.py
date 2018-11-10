@@ -6,7 +6,7 @@ import numpy, random
 # global variables
 
 # experiment info initialization
-expInfo = {'group':'','id':''}
+expInfo = {'id':''}
 expInfo['dateStr'] = data.getDateStr()  # add the current time
 
 # present a dialogue to change params
@@ -138,15 +138,20 @@ def pa_trial(cues, responses, i):
         
     return (cue, inputs[1], correctness)
     
-pa_training_instructions = "In this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues. \n\nIn this first part, you will be presented with cue and response pairs. You will be presented with each pair 3 times, and there will be 8 words. The training will take about 30 seconds. \n\nPress the 'right' arrow to continue"
+pa_task_introduction = "In this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues. There will be 6 trials of this task. In each trial there is a training portion--where you are given cue and response pairs and you should aim to remember them--and a testing portion--where you will be tested on your memory of the cue and response pairs.\n\nPress the 'right' arrow to continue"
 
-pa_training_instructions = "Now you will be presented with a pair of a cue and response. If the correct response is listed for that given cue, click the 'f' key. Else, click the 'j' key if you think the incorrect reponse is listed for the given cue.\n\nPress the 'right' arrow to continue"
+pa_training_instructions = "You will now be presented with cue and response pairs. The cue will be displayed on the top and the response will be displayed underneath the cue. You will be presented with each pair 3 times, and there will be 8 words. The training will take about 30 seconds.\n\nPress the 'right' arrow to continue"
+
+pa_testing_instructions  = "Now you will be presented with a pair of a cue and response. It is possible that the listed response is the incorrect or correct response for that cue. If the correct response is listed for that given cue, click the 'f' key. Else, click the 'j' key if you think the incorrect reponse is listed for the given cue.\n\nPress the 'right' arrow to continue"
 
 def pa_experiment(task_num):
     # make a text file to save data
     fileName = expInfo['id'] + '_pa_'+ expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile.write('cue,time,correctness\n')
+
+    # Task introduction
+    display_and_wait(pa_task_introduction)
 
     # hard tasks
     # Right now 3 trials of 8 pairs
@@ -156,12 +161,12 @@ def pa_experiment(task_num):
         trial_responses = hard_responses[i*8:(i+1)*8]
 
         # Task description: training
-        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Training\n\n" + pa_training_instructions)
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(i+1)+" out of 6: Training\n\n" + pa_training_instructions)
 
         pa_train(trial_cues, trial_responses)
     
         # Task description: testing
-        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Testing\n\n" + pa_training_instructions)
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(i+1)+" out of 6: Testing\n\n" + pa_testing_instructions)
 
         for cue in range(len(trial_cues)):
             output = pa_trial(trial_cues, trial_responses, cue)
@@ -175,12 +180,12 @@ def pa_experiment(task_num):
         trial_responses = easy_responses[i*8:(i+1)*8]
 
         # Task description: training
-        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Training\n\n" + pa_training_instructions)
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(i+4)+" out of 6: Training\n\n" + pa_training_instructions)
 
         pa_train(trial_cues, trial_responses)
     
         # Task description: testing
-        display_and_wait("Task "+task_num+"\nTrial "+str(i+1)+" out of 3: Testing\n\n" + pa_training_instructions)
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(i+4)+" out of 6: Testing\n\n" + pa_training_instructions)
 
         for cue in range(len(trial_cues)):
             output = pa_trial(trial_cues, trial_responses, cue)
@@ -544,78 +549,51 @@ The paper, which will be presented in May at the International Conference on Rob
 exp_intro_message = u'''
 For this experiment, you will be working with Jibo, a small tabletop social robot. 
 
-Jibo’s “loop” is a group of people Jibo can recognize by face and voice, and is who Jibo considers his family. To get started, please take a few minutes to add yourself to Jibo’s loop. The experimenter will help you add yourself to the loop.
-
-If you need assistance at any time during this or any later parts of the experiment, please feel free to ask the experimenter.'''
-
-con_intro_message = u'''
-For this experiment, you will be using Jibo, a small tabletop robot that can be programmed to move and speak, among other abilities. To get started, please take a few minutes to familiarize yourself with some simple Jibo commands on the tablet provided. 
-
-Until told to, please do not click the “Begin” button on the tablet.
-
-First, enter your name (or nickname) and given participant ID. Note that your name will not be associated with your PID or any performance measures when we perform the experimental analysis. Afterwards, feel free to experiment with the “Speak” and “Move” buttons until time is over. We suggest trying to move Jibo in various directions.
-
-When it is time to move on, future instructions will be displayed on this screen.'''
+Please wait until the experimenter has signalled that you should continue.'''
 
 pre_task_message = u'''
-In this part of the experiment, you will complete a series of pre-tasks that we will use as baseline performance measures. You will not need Jibo or the tablet for this part of the experiment. Please click the “Begin” button on Jibo when you are ready to start, and then move on to the next page.'''
+In this part of the experiment, you will complete a series of pre-tasks that we will use as baseline performance measures. There will be 3 types of tasks that you will carry out. First, you will learn and be tested on cue and response pairs. Next, you will be given a word and told to write verbs associated with that word. Finally, you will be given some passages to read, and you will be asked about the passages. Let's start!'''
 
 def main():
-    # print out the correct introductory page for each setting
-    if (expInfo['group'] in ['b', 'B']): # experimental
-        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)
-        introduction_message.draw()
-        win.flip()
-        waitForRight()
-    else: # control
-        timer = core.CountdownTimer()
-        timer.reset(180)
-        
-        while (timer.getTime() > 0):
-            timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])
-            timer_stim.draw()
-            
-            introduction_message = visual.TextStim(win, font="Courier", text=con_intro_message, height=0.5)
-            introduction_message.draw()
-            win.flip()
-        
-    introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'right' arrow when you are ready to continue", height=0.8)
-    introduction_message.draw()
-    win.flip()
-    waitForRight()
+    display_and_wait(exp_intro_message)
+
+    display_and_wait(pre_task_message + "\n\nPress the 'right' arrow to continue")
     
     participant_id = int(expInfo['id'])
-    counterbalance_id = participant_id % 6
-    if (counterbalance_id == 0): # pa, wa, rc
-#        print("pa, wa, rc")
-        pa_experiment('1')
-        wa_experiment('2')
-        rc_experiment('3')
-    elif (counterbalance_id == 1): # pa, rc, wa
-#        print("pa, rc, wa")
-        pa_experiment('1')
-        rc_experiment('2')
-        wa_experiment('3')
-    elif (counterbalance_id == 2): # wa, pa, rc
-#        print("wa, pa, rc")
-        wa_experiment('1')
-        pa_experiment('2')
-        rc_experiment('3')
-    elif (counterbalance_id == 3): # wa, rc, pa
-#        print("wa, rc, pa")
-        wa_experiment('1')
-        rc_experiment('2')
-        pa_experiment('3')
-    elif (counterbalance_id == 4): # rc, pa, wa
-#        print("rc, pa, wa")
-        rc_experiment('1')
-        pa_experiment('2')
-        wa_experiment('3')
-    else: # rc, wa, pa
-#        print("rc, wa, pa")
-        rc_experiment('1')
-        wa_experiment('2')
-        pa_experiment('3')
+    pa_experiment('1')
+#         wa_experiment('2')
+#         rc_experiment('3')
+#     counterbalance_id = participant_id % 6
+#     if (counterbalance_id == 0): # pa, wa, rc
+# #        print("pa, wa, rc")
+#         pa_experiment('1')
+#         wa_experiment('2')
+#         rc_experiment('3')
+#     elif (counterbalance_id == 1): # pa, rc, wa
+# #        print("pa, rc, wa")
+#         pa_experiment('1')
+#         rc_experiment('2')
+#         wa_experiment('3')
+#     elif (counterbalance_id == 2): # wa, pa, rc
+# #        print("wa, pa, rc")
+#         wa_experiment('1')
+#         pa_experiment('2')
+#         rc_experiment('3')
+#     elif (counterbalance_id == 3): # wa, rc, pa
+# #        print("wa, rc, pa")
+#         wa_experiment('1')
+#         rc_experiment('2')
+#         pa_experiment('3')
+#     elif (counterbalance_id == 4): # rc, pa, wa
+# #        print("rc, pa, wa")
+#         rc_experiment('1')
+#         pa_experiment('2')
+#         wa_experiment('3')
+#     else: # rc, wa, pa
+# #        print("rc, wa, pa")
+#         rc_experiment('1')
+#         wa_experiment('2')
+#         pa_experiment('3')
     
     introduction_message = visual.TextStim(win, font="Courier", text="You finished the pre-task! Please let an experimenter know that you have finished!")
     introduction_message.draw()
