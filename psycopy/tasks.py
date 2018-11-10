@@ -80,13 +80,9 @@ def pa_getInput(cue, response, same):
                     thisResp = -1 # incorrect
                 else:
                     thisResp = 1 # correct
-#            elif thisKey in ['q', 'escape']:
-#                core.quit()  # abort experiment
         event.clearEvents()
         
     trialTime = trialClock.getTime()
-    
-#    win.flip()
 
     return (thisResp, trialTime)
     
@@ -198,63 +194,7 @@ def pa_experiment(task_num):
 # # # # # # # # # # # # #
 easy_stimuli = ["rope", "ball", "wheel"]
 hard_stimuli = ["kite", "scissors", "projector"]
-#easy_stimuli = ["rope", "ball"]
-#hard_stimuli = ["kite", "scissors"]
 counter = core.CountdownTimer()
-
-def oa_getInput(image):
-    # get input from user
-    trialClock.reset()
-
-    xpos = -2
-    letters = []
-    word = ""
-    
-    cue_message = visual.ImageStim(win, pos=[0,5], image=image, size=(10))
-    cue_message.draw()
-    
-    timer = visual.TextStim(win, text=str(int(counter.getTime())), pos=[14,10])
-    timer.draw()
-        
-    win.flip()
-
-    while counter.getTime() > 0:
-        cue_message.draw()
-        
-        timer = visual.TextStim(win, text=str(int(counter.getTime())), pos=[14,10])
-        timer.draw()
-        
-        allKeys=event.waitKeys(maxWait=1)
-        
-        if (allKeys != None):
-            thisKey = allKeys[0]
-            
-            if (thisKey in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']):
-                letters.append(visual.TextStim(win, pos=[xpos,-2], font="Courier", text=thisKey))
-                word += thisKey
-                xpos += 0.5
-            elif (thisKey == 'backspace' and len(letters) > 0):
-                letters.pop()
-                word = word[:-1]
-                xpos -= 0.5
-            elif (thisKey == 'return'):
-                break
-            
-            for letter in letters:
-                letter.draw()
-                
-            win.flip()
-            event.clearEvents()  # clear other (eg mouse) events - they clog the buffer
-        else:
-            for letter in letters:
-                letter.draw()
-            win.flip()
-        
-    trialTime = trialClock.getTime()
-    
-    win.flip()
-
-    return (word, trialTime)
 
 def wa_getInput(stimulus):
     # get input from user
@@ -310,6 +250,10 @@ def wa_getInput(stimulus):
 
     return (word, trialTime)
 
+wa_task_introduction = "In this task, you will be presented with a word, and you will have to write verbs related to that word. There will be 6 trials of this task. Your responses should all be single words, composed entirely out of letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'right' arrow to continue"
+
+wa_testing_message   = "You will be given 30 seconds to write as many verbs as you can think of. Remember to hit the 'enter' key after each word you type.\n\nPress the 'right' arrow to continue"
+
 def wa_experiment(task_num):
     # make a text file to save data
     fileName = expInfo['id'] + '_wa_' + expInfo['dateStr']
@@ -320,26 +264,24 @@ def wa_experiment(task_num):
     
     exp_letter = 'a'
     trial_time = 30
+    trial = 1
     
     for stimulus in hard_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type. You will have 30 seconds to write as many verbs as you can.\n\nPress the 'right' arrow to continue")
-        instruction_message.draw()
-        win.flip()
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(trial)+" out of 6\n\n" + wa_testing_message)
+
         exp_letter = chr(ord(exp_letter) + 1)
-        waitForRight()
-        
+        trial += 1
+
         counter.reset(trial_time)
         while (counter.getTime() > 0):
             output = wa_getInput(stimulus)
-    #        output = oa_getInput("ball.jpg")
             dataFile.write('%s,%s,%.3f\n' %(stimulus, output[0], output[1]))
     
     for stimulus in easy_stimuli:
-        instruction_message = visual.TextStim(win, pos=[0,0], font="Courier", text="Task "+task_num+"."+exp_letter+"\n\nIn this task, you will be presented with a word and you will need to write verbs related to that word. Your answers must be single words, composed entirely of alphabetic letters. Use the keyboard to record your responses, and hit the 'right' arrow after each word you type.\n\nPress the 'right' arrow to continue")
-        instruction_message.draw()
-        win.flip()
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(trial)+" out of 6\n\n" + wa_testing_message)
+
         exp_letter = chr(ord(exp_letter) + 1)
-        waitForRight()
+        trial += 1
         
         counter.reset(trial_time)
         while (counter.getTime() > 0):
@@ -561,8 +503,9 @@ def main():
     
     participant_id = int(expInfo['id'])
     pa_experiment('1')
-#         wa_experiment('2')
-#         rc_experiment('3')
+    wa_experiment('2')
+    rc_experiment('3')
+
 #     counterbalance_id = participant_id % 6
 #     if (counterbalance_id == 0): # pa, wa, rc
 # #        print("pa, wa, rc")
