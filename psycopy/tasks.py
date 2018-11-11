@@ -504,7 +504,9 @@ For this experiment, you will be working with Jibo, a small tabletop social robo
 
 control_intro_message = u'''
 For this experiment, you will be using Jibo, a small tabletop robot that can be programmed to move and speak, and do other behaviors. To get started, you will spend a few minutes to familiarize yourself with some simple Jibo commands on the tablet provided. Until told to do so, please do not click the “Begin” button on the tablet.
+
 First, enter your name (or desired nickname) and given participant ID. Note that your identity (i.e. name) will not be associated with your PID or any of the performance measures when in the experimental analysis. Afterward confirming your name and PID, feel free to experiment with the “Speak” and “Move” buttons until time is over. We suggest trying to move Jibo in various directions.
+
 When it is time to move on, future instructions will be displayed on this screen.
 '''
 
@@ -512,11 +514,13 @@ pre_task_message = u'''
 In this part of the experiment, you will complete a series of tasks that we will use to calculate baseline performance measures for each participant. You will only need this computer for this part of the experiment. Since you will not need a robot or tablet for this part, let's turn Jibo on to a non-interactive behavior mode. Please click the “Begin” button on Jibo when you are ready to begin, and then move on to the next page. If you need assistance at any time, please feel free to ask the experimenter.'''
 
 def main():
-    display_and_wait(exp_intro_message)
+    participant_id = int(expInfo['id'])
+
+    if ((participant_id % 2) == 0): # experimental        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)        introduction_message.draw()        win.flip()        waitForRight()    else: # control        timer = core.CountdownTimer()        timer.reset(180)                while (timer.getTime() > 0):            timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])            timer_stim.draw()                        introduction_message = visual.TextStim(win, font="Courier", text=control_intro_message, height=0.7)            introduction_message.draw()            
+            win.flip()
 
     display_and_wait(pre_task_message + "\n\nPress the 'right' arrow to continue")
     
-    participant_id = int(expInfo['id'])
     pa_experiment('1')
     wa_experiment('2')
     rc_experiment('3')
