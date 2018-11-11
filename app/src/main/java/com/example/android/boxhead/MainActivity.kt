@@ -205,7 +205,6 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
 
     fun onSubmitClick() {
         // Assign variables
-
         if (mCommandLibrary != null && inputName.text != null && inputPID.text != null ) {
             pidName = inputName.text.toString()
             if (pidName == "" || inputPID.text?.toString() == "")
@@ -228,13 +227,12 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
 
     fun onConfirmClick() {
         // Assign variables
-
         if (mCommandLibrary != null && inputName.text != null && inputPID.text != null ) {
             pidName = inputName.text.toString()
             if (pidName == "" || inputPID.text?.toString() == "")
                 return
             pid = inputPID.text.toString()?.toInt()
-            displayText("Confirmed: " + pidName + ". PID:" + pid)
+            displayText("Confirmed: " + pidName + ", PID:" + pid)
             log("Confirm button clicked.")
         }
     }
@@ -255,10 +253,10 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         val posX = moveX.text.toString()
         val posY = moveY.text.toString()
         val posZ = moveZ.text.toString()
-        if (posX != "" && posY != "" && posZ != "")
+        if (posX != "" && posY != "" && posZ != "") {
             log("Moving to position: " + posX + " " + posY + " " + posZ)
             return onMoveClick(intArrayOf(posX.toInt(), posY.toInt(), posZ.toInt()))
-
+        }
         return null
     }
 
@@ -272,42 +270,58 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
     }
 
     private fun canMove() : Boolean {
-        if (System.currentTimeMillis() - lastMoveTime > 2000) return true
+        if (System.currentTimeMillis() - lastMoveTime > 3000) return true
         return false
     }
 
-    private fun passiveMovement(prob : Int): Boolean{
+    private fun randNumInRange(lb : Int, ub : Int): Int {
+        return (Math.random() * lb).toInt() + ub
+    }
+
+    private fun passiveMovement(prob : Int): Boolean {
         if (Math.random() * 100 > prob || !canMove())
             return false
-        val movevals = listOf(-4, -3, -2, -1, 0, 1, 2, 3, 4)
+        // control: x: -1 to 2, y: 2 to 5
+        // exp: x: 1 to 4, y: -2 to 1
         log("Performing passive movement")
         if (radioControl.isChecked){
-            onMoveClick(intArrayOf(movevals[(Math.random() * 3).toInt()], movevals[(Math.random() * 4).toInt()], 1))
+            onMoveClick(intArrayOf(randNumInRange(-1, 2), randNumInRange(2, 5), randNumInRange(-1, 1)))
         } else {
-            onMoveClick(intArrayOf(movevals[(Math.random() * 3 + 4).toInt()], movevals[(Math.random() * 4 + 3).toInt()], 1))
+            onMoveClick(intArrayOf(randNumInRange(1, 4), randNumInRange(-2, 1), randNumInRange(-1, 1)))
         }
         return true
     }
 
+    // function returns a random item from an array of strings 'list'
+    private fun getRandom(list: List<String>?): String {
+        if (list == null)
+            return ""
+        return list[(Math.random() * list.size).toInt()]
+    }
+
     private fun esmlPassive(prob: Int) : Boolean {
         if (mCommandLibrary != null) {
+            val controlESML = listOf("<anim cat='laughing' endNeutral='true' layers='body'/>",
+                    "<anim cat='frustrated' endNeutral='true' layers='body'/>", "<anim cat='affection' endNeutral='true' layers='body'/>",
+                    "<anim cat='relieved' endNeutral='true' layers='body'/>",
+                    "<anim cat='happy' endNeutral='true' layers='body'/>", "<anim cat='excited' endNeutral='true' layers='body'/>",
+                    "<anim cat='confused' endNeutral='true' layers='body'/>", "<anim cat='embarrassed' endNeutral='true' layers='body'/>")
+            val expESML = listOf("<anim cat='laughing' endNeutral='true'/>", "<anim cat='frustrated' endNeutral='true' layers='body'/>",
+                    "<anim cat='affection' endNeutral='true' layers='body'/>", "<anim cat='relieved' endNeutral='true'/>",
+                    "<anim cat='happy' endNeutral='true'/>", "<anim cat='excited' endNeutral='true'/>",
+                    "<anim cat='confused' endNeutral='true'/>", "<anim cat='embarrassed' endNeutral='true'/>")
+            // confused, embarrassed
             if (Math.random() * 100 < prob && canMove()) {
-                val rand = Math.random() * 100
-                var text = "<anim cat='laughing' endNeutral='true' layers='body'/>"
-                when {
-                    rand < 16 -> text = "<anim cat='frustrated' endNeutral='true' layers='body'/>"
-                    rand < 32 -> text = "<anim cat='affection' endNeutral='true' layers='body'/>"
-                    rand < 48 -> text = "<anim cat='relieved' endNeutral='true' layers='body'/>"
-                    rand < 64 -> text = "<anim cat='happy' endNeutral='true' layers='body'/>"
-                    rand < 70 -> text = "<anim cat='excited' endNeutral='true' layers='body'/>"
-                }
+                var text = getRandom(controlESML)
+                if (radioExperimental.isChecked)
+                    text = getRandom(expESML)
                 lastMoveTime = System.currentTimeMillis()
                 mCommandLibrary?.say(text, this)
                 log("Passive ESML behavior: $text")
                 return true
             }
         }
-        return true
+        return false
     }
 
     private fun glanceBehavior(prob: Int): Boolean {
@@ -315,15 +329,14 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
             log("Glancing behavior activated")
             var returnPos = intArrayOf(3, 0, 1)
             if (radioControl.isChecked)
-                returnPos = intArrayOf(-3, 0, 1)
+                returnPos = intArrayOf(3, 5, 1)
             onMoveClick(returnPos)
-            val glanceTimer = object : CountDownTimer( 5000, 1000) {
+            val glanceTimer = object : CountDownTimer(6000, 1000) {
                 override fun onFinish() { onMoveClick(returnPos) ; log("Glance completed; now looking back.") }
                 override fun onTick(millisUntilFinished: Long) {
-                    if ((millisUntilFinished/1000).toInt() == 2)
-                        log("Performing glance")
+                    if ((millisUntilFinished/1000).toInt() == 3)
                         if (radioControl.isChecked)
-                            onMoveClick(intArrayOf(-2, 1, 1))
+                            onMoveClick(intArrayOf(0, 5, 1))
                         else
                             onMoveClick(intArrayOf(2, -1, 1))
                 }
