@@ -88,7 +88,7 @@ def pa_getInput(cue, response, same):
     
 def pa_train(cues, responses):
     # number of times each pair is shown
-    num_trainings = 3
+    num_trainings = 4
     # number of seconds each pair is shown
     time_per_pair = 1
     
@@ -134,11 +134,11 @@ def pa_trial(cues, responses, i):
         
     return (cue, inputs[1], correctness)
     
-pa_task_introduction = "In this task, you will be presented with pairs of cues and responses, and you should aim to remember which responses are associated with which cues. There will be 6 trials of this task. In each trial there is a training portion--where you are given cue and response pairs and you should aim to remember them--and a testing portion--where you will be tested on your memory of the cue and response pairs.\n\nPress the 'right' arrow to continue"
+pa_task_introduction = "In this task, you will be presented with pairs of cues and responses, and your goal is to remember as many cue-response pairs as you can. There will be 6 trials of this task. In each trial there is a training part, where you will be given cue and response pairs and should aim to remember them as best you can, and a testing part where you will be tested on your memory of the correct cue-response pairs.\n\nPress the 'right' arrow to continue"
 
-pa_training_instructions = "You will now be presented with cue and response pairs. The cue will be displayed on the top and the response will be displayed underneath the cue. You will be presented with each pair 3 times, and there will be 8 words. The training will take about 30 seconds.\n\nPress the 'right' arrow to continue"
+pa_training_instructions = "You will now be presented with cue and response pairs. The cue will be displayed on the top and the response will be displayed below the cue. You will be given about 30 seconds to try to learn these cue-response pairs.\n\nPress the 'right' arrow to begin"
 
-pa_testing_instructions  = "Now you will be presented with a pair of a cue and response. It is possible that the listed response is the incorrect or correct response for that cue. If the correct response is listed for that given cue, click the 'f' key. Else, click the 'j' key if you think the incorrect reponse is listed for the given cue.\n\nPress the 'right' arrow to continue"
+pa_testing_instructions  = "Now you will be presented with cue-response pairs, for which the listed response may be the incorrect or correct response for that cue. If you believe the correct response is listed for that given cue, press the 'f' key. Else, press the 'j' key if you think the incorrect reponse is listed for the given cue.\n\nPress the 'right' arrow to begin"
 
 def pa_experiment(task_num):
     # make a text file to save data
@@ -250,9 +250,9 @@ def wa_getInput(stimulus):
 
     return (word, trialTime)
 
-wa_task_introduction = "In this task, you will be presented with a word, and you will have to write verbs related to that word. There will be 6 trials of this task. Your responses should all be single words, composed entirely out of letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type.\n\nPress the 'right' arrow to continue"
+wa_task_introduction = "In this task, you will be presented with a word, and your goal is to type as many verbs related to that word as possible. There will be 6 trials of this task. Your responses should all be single words, composed entirely out of letters. Use the keyboard to record your responses, and hit the 'enter' key after each word you type. While we will not count nonsense words or words that are not verbs, do not worry if you make any small typos. \n\nPress the 'right' arrow to continue"
 
-wa_testing_message   = "You will be given 30 seconds to write as many verbs as you can think of. Remember to hit the 'enter' key after each word you type.\n\nPress the 'right' arrow to continue"
+wa_testing_message   = "You will be given 30 seconds to write as many verbs as you can think of. Remember to hit the 'enter' key after each word you type.\n\nPress the 'right' arrow to begin"
 
 def wa_experiment(task_num):
     # make a text file to save data
@@ -391,7 +391,7 @@ def rc_experiment(task_num):
     dataFile1 = open(fileName1+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile1.write('article,time\n')
 
-    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n You will now read some articles. After each article you will be asked to answer some questions. You will be given a limited time to read each page, but you can move on to the next page by clicking any key.\n\nPress the 'right' arrow to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n As a last pre-task, you will now be given a couple of short articles about robotics to read. After each article, you will be asked to answer a few questions in order to test your comprehension. You will be given a limited but sufficient amount of time to read each page - the purpose of this task is not to memorize every detail, but to simply understand the main ideas of the articles, so if you finish reading a page before the time is over, please move on to the next page by clicking any key.\n\nPress the 'right' arrow to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -401,7 +401,7 @@ def rc_experiment(task_num):
     hard_article = u'''
 The field of Human–Robot Collaboration (HRC) is tasked with designing proactive and autonomous robot collaborators able to complement the superior capabilities of human workers to maximize throughput, improve safety of the workplace, and reduce cognitive load on humans. The general application domain for HRC is composed of a robot that collaborates with humans on a joint task such as furniture  assembly, assembly lines, or other factory-related applications. However, state of the art technologies still rely on sterile and rigid interactions that resort to turn-taking behaviors, tele-operation, or more generally limited autonomy and decision making capabilities. 
 
-Conversely, human–human interaction (HHI) during teamwork does not show this friction. Fluent and natural HHIs are multimodal, highly contextual and situated. This is particularly true when coordination during teamwork is at tended through natural language. Humans resolve the natural ambiguities of speech by integrating verbal with non-verbal cues and, importantly, by grounding speech to the physical domain of the interaction—e.g. through implicature or lexical entrainment. 
+Conversely, human–human interaction (HHI) during teamwork does not show this friction. Fluent and natural HHIs are multimodal, highly contextual and situated. This is particularly true when coordination during teamwork is attended through natural language. Humans resolve the natural ambiguities of speech by integrating verbal with non-verbal cues and, importantly, by grounding speech to the physical domain of the interaction — e.g. through implicature or lexical entrainment. 
 
 Yet, despite evidence of the importance of situated natural language in HHI, achieving the same level of richness still represents a significant challenge for HRI in general and HRC in particular. Reasons for this are specific to HRC, e.g. the presence of noise in environments such as those commonly found in factories. Noisy environments may result in failure to recognize significant portions of an utterance—if not the totality of it. This not only leads to erroneous naming of specific actions and objects, but also makes the structure of sentences harder to parse by natural language understanding (NLU) algorithms that exploit syntax. Most notably, impediments to deploying effective HRC interactions are also to be found in the very nature of the communication itself. Communication during collaboration often occurs in a time constrained context, is highly goal-oriented, typically requires a high success rate in order to be effective, is domain-dependent, and often features mutual adaptation between peers. The time constraint during collaboration pressures agents to make shorter utterances that might not be well-formed sentences; the noise and the need for unambiguity favor some classes of words over others, often resulting in a highly domain-specific language. All these factors greatly hamper the deployment of standard NLU techniques to HRC. State-of-the-art technologies resort extensively to hand-coded domain knowledge, or require training on large datasets most of which are taken from descriptive text and are borrowed from different contexts that do not necessarily leverage the specific domain knowledge. Still, to achieve the level of fluency seen in HHIs, a core ability of future generations of robots will be for them to collaborate with humans through the situated interactions with which humans are most comfortable. 
     '''
@@ -420,7 +420,7 @@ The system also gives general users more flexibility in designing furniture to b
 The paper, which will be presented in May at the International Conference on Robotics and Automation (ICRA) in Brisbane, Australia, was co-written by Lipton, Rus and PhD student Adriana Schulz. Other co-authors include MIT professor Wojciech Matusik, PhD student Andrew Spielberg and undergraduate Luis Trueba.
     '''
     
-    question_message = visual.TextStim(win, font="Courier", text="Article 1\n\nPress the 'right' arrow to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Article 1 of 2\n\nPress the 'right' arrow to begin", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -429,7 +429,7 @@ The paper, which will be presented in May at the International Conference on Rob
 
     rc_train(hard_article, "hard", dataFile1)
     
-    question_message = visual.TextStim(win, font="Courier", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'right' arrow to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Now you will answer some questions about the article you just read. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'right' arrow to begin", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -439,22 +439,27 @@ The paper, which will be presented in May at the International Conference on Rob
     dataFile2 = open(fileName2+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile2.write('time,correctness\n')
     
-    output = multipleChoice("Which of the above is not cited by the article an example of the joint tasks that humans can do with robots?", 
-                            ["Furniture assembly","Assembly lines","Food preparation"], "c")
+    output = multipleChoice("Which of these choices are examples of the joint tasks that humans can do with robots in the domain of HRC, according by the article?", 
+                            ["Furniture assembly","Assembly lines","Car assembly", "a & b", "All of the above"], "d")
+
+    dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
+
+    output = multipleChoice("Which of these choices is NOT cited by the article as examples of what is current being used by state of the art technologies?", 
+                            ["Turn-taking behaviors","Hand-coded domain knowledge","Deep learning", "Tele-operation", "b & c"], "c")
                                                       
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
-    output = multipleChoice("Which of the above is not cited by the article an example of how robot collaborators can benefit humans?", 
-                            ["Maximize throughput","Improve safety", "Improve quality", "Reduce cognitive load"], "c")
+    output = multipleChoice("Which of these choices is NOT cited by the article an example of how robot collaborators can benefit humans?", 
+                            ["Maximize throughput","Improve safety", "Improve quality", "Reduce cognitive load", "b & c"], "c")
                                                         
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
                             
-    output = multipleChoice("Which of the following are cited by the article an ways that humans resolve the natural ambiguities of speech?", 
-                            ["Non-verbal cues","Implicature","Lexcial entrainment","a & b only", "All of the above"], "e")
+    output = multipleChoice("Which of these choices are cited by the article an ways that humans resolve the natural ambiguities of speech?", 
+                            ["Non-verbal cues", "Implicature", "Lexical entrainment","a & b only", "All of the above"], "e")
                                                         
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
-    question_message = visual.TextStim(win, font="Courier", text="Article 2\n\nPress the 'right' arrow to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Article 2 of 2\n\nPress the 'right' arrow to continue", pos=(0,4))
     question_message.draw()
 
     win.flip()
@@ -463,20 +468,26 @@ The paper, which will be presented in May at the International Conference on Rob
     
     rc_train(easy_article, "easy", dataFile1)
     
-    question_message = visual.TextStim(win, font="Courier", text="Now you will need to answer some questions. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'enter' to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Now you will answer some questions about the article you just read. Press the appropriate key for the answer choice you are choosing. For instance, press the 'c' key if you think choice 'c' is the correct answer.\n\nPress the 'right' arrow to begin", pos=(0,4))
     question_message.draw()
 
     win.flip()
     
     waitForRight()
+
+
+    output = multipleChoice("Which of these choices is NOT cited by the article as motivations for the development of AutoSaw?", 
+                            ["To let users focus on design", "To increase output", "To minimize injury", "To let users focus on bigger-picture tasks"], "b")
+                            
+    dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
     output = multipleChoice("Where was the AutoSaw technology developed?", 
-                            ["Stanford","Caltech", "MIT", "Harvard", "Yale"], "c")
+                            ["Stanford", "Caltech", "MIT", "Yale"], "c")
                             
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
                             
     output = multipleChoice("How did the authors avoid having the user put their hand near the blades?", 
-                            ["Automated process","Planning algorithms","Deep learning of cuts"], "a")
+                            ["Automated process","Planning algorithms","Deep learning of cuts", "a & b"], "a")
                             
     dataFile2.write('%s,%.3f\n' %(output[0], output[1]))
     
@@ -489,12 +500,16 @@ The paper, which will be presented in May at the International Conference on Rob
     dataFile2.close()
 
 exp_intro_message = u'''
-For this experiment, you will be working with Jibo, a small tabletop social robot. 
+For this experiment, you will be working with Jibo, a small tabletop social robot. Jibo’s “loop” is a group of people Jibo can recognize by face and voice, and is who Jibo considers his family. To get started, please take a few minutes to add yourself to Jibo’s loop. An experimenter will help you complete this part of the experiment.'''
 
-Please wait until the experimenter has signalled that you should continue.'''
+control_intro_message = u'''
+For this experiment, you will be using Jibo, a small tabletop robot that can be programmed to move and speak, and do other behaviors. To get started, you will spend a few minutes to familiarize yourself with some simple Jibo commands on the tablet provided. Until told to do so, please do not click the “Begin” button on the tablet.
+First, enter your name (or desired nickname) and given participant ID. Note that your identity (i.e. name) will not be associated with your PID or any of the performance measures when in the experimental analysis. Afterward confirming your name and PID, feel free to experiment with the “Speak” and “Move” buttons until time is over. We suggest trying to move Jibo in various directions.
+When it is time to move on, future instructions will be displayed on this screen.
+'''
 
 pre_task_message = u'''
-In this part of the experiment, you will complete a series of pre-tasks that we will use as baseline performance measures. There will be 3 types of tasks that you will carry out. First, you will learn and be tested on cue and response pairs. Next, you will be given a word and told to write verbs associated with that word. Finally, you will be given some passages to read, and you will be asked about the passages. Let's start!'''
+In this part of the experiment, you will complete a series of tasks that we will use to calculate baseline performance measures for each participant. You will only need this computer for this part of the experiment. Since you will not need a robot or tablet for this part, let's turn Jibo on to a non-interactive behavior mode. Please click the “Begin” button on Jibo when you are ready to begin, and then move on to the next page. If you need assistance at any time, please feel free to ask the experimenter.'''
 
 def main():
     display_and_wait(exp_intro_message)
@@ -538,11 +553,10 @@ def main():
 #         wa_experiment('2')
 #         pa_experiment('3')
     
-    introduction_message = visual.TextStim(win, font="Courier", text="You finished the pre-task! Please let an experimenter know that you have finished!")
+    introduction_message = visual.TextStim(win, font="Courier", text="You've finished this part of the experiment! Please let an experimenter know that you are done.")
     introduction_message.draw()
     win.flip()
     waitForRight()
-
     
     win.close()
     core.quit()
