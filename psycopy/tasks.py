@@ -259,6 +259,8 @@ def wa_experiment(task_num):
     fileName = expInfo['id'] + '_wa_' + expInfo['dateStr']
     dataFile = open(fileName+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile.write('stimulus,response,time\n')
+    
+    display_and_wait(wa_task_introduction)
 
     globalClock.reset()
     
