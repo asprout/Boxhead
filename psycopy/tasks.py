@@ -295,7 +295,7 @@ def wa_experiment(task_num):
 # # # # # # # # # # # # #
 
 def splitPage(article):
-    i = 1000
+    i = 1100
     segs = []
     
     seg = article[:i]
@@ -391,7 +391,7 @@ def rc_experiment(task_num):
     dataFile1 = open(fileName1+'.csv', 'w')  # a simple text file with 'comma-separated-values'
     dataFile1.write('article,time\n')
 
-    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n As a last pre-task, you will now be given a couple of short articles about robotics to read. After each article, you will be asked to answer a few questions in order to test your comprehension. You will be given a limited but sufficient amount of time to read each page - the purpose of this task is not to memorize every detail, but to simply understand the main ideas of the articles, so if you finish reading a page before the time is over, please move on to the next page by clicking any key.\n\nPress the 'right' arrow to continue", pos=(0,4))
+    question_message = visual.TextStim(win, font="Courier", text="Task " + task_num + "\n\n As a last pre-task, you will now be given a couple of short articles about robotics to read. After each article, you will be asked to answer a few questions in order to test your comprehension. You will be given a limited but sufficient amount of time to read each page - the purpose of this task is not to memorize every detail, but to simply understand the main ideas of the articles, so if you finish reading a page before the time is over, please move on to the next page by clicking any key.\n\nPress the 'right' arrow to continue", height=0.7)
     question_message.draw()
 
     win.flip()
@@ -519,7 +519,10 @@ def main():
     if ((participant_id % 2) == 0): # experimental        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)        introduction_message.draw()        win.flip()        waitForRight()    else: # control        timer = core.CountdownTimer()        timer.reset(180)                while (timer.getTime() > 0):            timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])            timer_stim.draw()                        introduction_message = visual.TextStim(win, font="Courier", text=control_intro_message, height=0.7)            introduction_message.draw()            
             win.flip()
 
-    display_and_wait(pre_task_message + "\n\nPress the 'right' arrow to continue")
+    introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'right' arrow to continue", height=0.7)
+    introduction_message.draw()
+    win.flip()
+    waitForRight()
     
     pa_experiment('1')
     wa_experiment('2')
