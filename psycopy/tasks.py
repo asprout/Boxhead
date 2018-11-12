@@ -513,12 +513,27 @@ When it is time to move on, future instructions will be displayed on this screen
 '''
 
 pre_task_message = u'''
-In this part of the experiment, you will complete a series of tasks that we will use to calculate baseline performance measures for each participant. You will only need this computer for this part of the experiment. Since you will not need a robot or tablet for this part, let's turn Jibo on to a non-interactive behavior mode. Please click the “Begin” button on Jibo when you are ready to begin, and then move on to the next page. If you need assistance at any time, please feel free to ask the experimenter.'''
+In this part of the experiment, you will complete a series of tasks that we will use to calculate baseline performance measures for each participant. You will only need this computer for this part of the experiment. Since you will not need a robot or tablet for this part, let's turn Jibo on to a non-interactive behavior mode. Please click the “Begin” button on the tablet when you are ready to begin, and then move on to the next page. If you need assistance at any time, please feel free to ask the experimenter.'''
 
 def main():
     participant_id = int(expInfo['id'])
 
-    if ((participant_id % 2) == 0): # experimental        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)        introduction_message.draw()        win.flip()        waitForRight()    else: # control        timer = core.CountdownTimer()        timer.reset(180)                while (timer.getTime() > 0):            timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])            timer_stim.draw()                        introduction_message = visual.TextStim(win, font="Courier", text=control_intro_message, height=0.7)            introduction_message.draw()            
+    if ((participant_id % 2) == 0): # experimental
+        introduction_message = visual.TextStim(win, font="Courier", text=exp_intro_message, height=0.8)
+        introduction_message.draw()
+        win.flip()
+        waitForRight()
+    else: # control
+        timer = core.CountdownTimer()
+        timer.reset(180)
+        
+        while (timer.getTime() > 0):
+            timer_stim = visual.TextStim(win, text=str(int(timer.getTime())), pos=[14,10])
+            timer_stim.draw()
+            
+            introduction_message = visual.TextStim(win, font="Courier", text=control_intro_message, height=0.7)
+            introduction_message.draw()
+            
             win.flip()
 
     introduction_message = visual.TextStim(win, font="Courier", text=pre_task_message + "\n\nPress the 'right' arrow to continue", height=0.7)
