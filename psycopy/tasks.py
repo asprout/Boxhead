@@ -181,7 +181,7 @@ def pa_experiment(task_num):
         pa_train(trial_cues, trial_responses)
     
         # Task description: testing
-        display_and_wait("Task "+task_num+"\n\nTrial "+str(i+4)+" out of 6: Testing\n\n" + pa_training_instructions)
+        display_and_wait("Task "+task_num+"\n\nTrial "+str(i+4)+" out of 6: Testing\n\n" + pa_testing_instructions)
 
         for cue in range(len(trial_cues)):
             output = pa_trial(trial_cues, trial_responses, cue)
