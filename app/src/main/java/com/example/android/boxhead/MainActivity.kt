@@ -25,9 +25,9 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
     // List of robots associated with a user's account
     private var mRobots: ArrayList<Robot>? = null
     private var myBotNum: Int = 0
-    // Times last Jibo movement
+    // Time of last Jibo movement, to prevent calls canceling each other out
     private var lastMoveTime: Long = 0
-    // Variable to time Jibo's screen display
+    // Variable to time Jibo's screen display and revert to normal eye at end
     private var displayTimer: CountDownTimer? = object : CountDownTimer(8000, 1000) {
         override fun onFinish() { // after some time of displaying text, display the eye again
             mCommandLibrary?.display(Command.DisplayRequest.EyeView("eye"), null)
@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         }
         // start running the background activity
         val backgroundTimer = Timer()
-        backgroundTimer.schedule(BackgroundActivity(), 6000, 6000)
+        backgroundTimer.schedule(BackgroundActivity(), 2000, 6000)
     }
 
     override fun onConnectionFailed(throwable: Throwable) {
@@ -188,24 +188,31 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         }
     }
 
-    /* BACKGROUND ACTIVITY FUNCTION (occurs every 10 seconds) */
+    /* BACKGROUND ACTIVITY FUNCTION (occurs every x seconds) */
     inner class BackgroundActivity : TimerTask() {
 
         override fun run() {
+            // when called, while the Begin button is clicked, perform the behaviors by probability
             runOnUiThread {
                 if (mCommandLibrary != null && buttonBegin.isChecked) {
                     if (!glanceBehavior(25)) {
                         if (!esmlPassive(50))
-                            passiveMovement(50)
+                            passiveMovement(60)
                     }
                 }
             }
         }
     }
 
-    fun onSubmitClick() {
-        // Assign variables
-        if (mCommandLibrary != null && inputName.text != null && inputPID.text != null ) {
+    private fun log(msg: String) {
+        Log.d("Boxhead", msg)
+    }
+
+    /* Project-specific functions */
+
+    fun onSubmitClick() { // Called when the Submit button is clicked
+        // Displays the name and PID entered into the tablet, if properly inputted
+        if (mCommandLibrary != null && inputName.text != null && inputPID.text != null) {
             pidName = inputName.text.toString()
             if (pidName == "" || inputPID.text?.toString() == "")
                 return
@@ -213,19 +220,9 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
             displayText("Hi " + pidName + ". Please confirm your ID: " + pid)
             log("Submit button clicked.")
         }
-
-        /*
-        val testvals = listOf(-4, -3, -2, -1, 0, 1, 2, 3, 4)
-        for (i in testvals.indices){
-            for (j in testvals.indices) {
-                displayText("Position: " + testvals[i] + ", " + testvals[j])
-                onMoveClick(intArrayOf(testvals[i], testvals[j], 1))
-                Thread.sleep(2000)
-            }
-        }*/
     }
 
-    fun onConfirmClick() {
+    fun onConfirmClick() { // Called when the Confirm button is clicked
         // Assign variables
         if (mCommandLibrary != null && inputName.text != null && inputPID.text != null ) {
             pidName = inputName.text.toString()
@@ -237,30 +234,25 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         }
     }
 
-    /* Project-specific functions */
-
-    private fun log(msg: String) {
-        Log.d("Boxhead", msg)
-    }
-
-    private fun onSpeakClick() : String? {
-        if (sayText.text != null)
+    private fun onSpeakClick() : String? { // Called when the Speak button is clicked
+        if (sayText.text != null) // If proper input, has Jibo say the name in the sayText field
             return say(sayText.text?.toString())
         return null
     }
 
-    private fun onMoveClick() : String? {
+    private fun onMoveClick() : String? { // Called when the Move button is clicked
         val posX = moveX.text.toString()
         val posY = moveY.text.toString()
         val posZ = moveZ.text.toString()
         if (posX != "" && posY != "" && posZ != "") {
+            // if proper input, has Jibo move to the input (X, Y, Z) position
             log("Moving to position: " + posX + " " + posY + " " + posZ)
             return onMoveClick(intArrayOf(posX.toInt(), posY.toInt(), posZ.toInt()))
         }
         return null
     }
 
-    private fun onMoveClick(position: IntArray) : String? { // moves based on given position
+    private fun onMoveClick(position: IntArray) : String? { // moves Jibo based on given position
         if (mCommandLibrary != null){
             lastMoveTime = System.currentTimeMillis()
             log("Moving to position: " + position[0] + " " + position[1] + " " + position[2])
@@ -269,15 +261,18 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         return null
     }
 
-    private fun canMove() : Boolean {
+    private fun canMove() : Boolean { // returns true if 3s has passed since last move
         if (System.currentTimeMillis() - lastMoveTime > 3000) return true
         return false
     }
 
+    // returns a random number in the range of [lb, ub]
     private fun randNumInRange(lb : Int, ub : Int): Int {
-        return (Math.random() * lb).toInt() + ub
+        return (Math.random() * (ub - lb + 1)).toInt() + lb
     }
 
+    // has Jibo perform a passive movement with probability prob (out of 100),
+    // where a passive movement is to turn to any of the positions in a specified range
     private fun passiveMovement(prob : Int): Boolean {
         if (Math.random() * 100 > prob || !canMove())
             return false
@@ -299,6 +294,9 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         return list[(Math.random() * list.size).toInt()]
     }
 
+    // has Jibo perform a passive ESML behavior with probability prob (out of 100)
+    // where for the experimental condition, behaviors may also include screen behaviors
+    // (such as showing changes in eye shape)
     private fun esmlPassive(prob: Int) : Boolean {
         if (mCommandLibrary != null) {
             val controlESML = listOf("<anim cat='laughing' endNeutral='true' layers='body'/>",
@@ -324,6 +322,8 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         return false
     }
 
+    // with prob/100 probability, performs a glance behavior from one area to another, then back
+    // (in this experiment, looks at the participant, screen, and then back)
     private fun glanceBehavior(prob: Int): Boolean {
         if (Math.random() * 100 < prob) {
             log("Glancing behavior activated")
@@ -347,6 +347,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         return false
     }
 
+    // displays text on Jibo's screen for a short amount of time
     private fun displayText(text: String){
         if (mCommandLibrary != null){
             val displayText = text.replace("(.{40,}? )".toRegex(), "$1\n")
@@ -358,6 +359,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         }
     }
 
+    // Tells Jibo to speak text
     private fun say(text : String?) : String? {
         if (mCommandLibrary != null && text != null && text != "") {
             log("Said: $text")
@@ -367,16 +369,7 @@ class MainActivity : AppCompatActivity(), OnConnectionListener, CommandLibrary.O
         return null
     }
 
-    // Interact Button
-    private fun onInteractClick() {
-        if (mCommandLibrary != null) {
-            return
-        }
-    }
-
-    /* onCommandResponseListener overrides!
-    Code for Jibo to perform: */
-
+    /* onCommandResponseListener overrides! */
     override fun onSuccess(s: String) {
         runOnUiThread { }
     }
