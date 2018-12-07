@@ -8,7 +8,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Helper functions:
@@ -34,7 +34,7 @@ for (i in 1:nrow(responses)){
   pids[i, 4] <- responses[i, 4] == "Male"
   pids[i, 5] <- responses[i, 9]
   pids[i, "jpn"] <- responses[i, 2] %in% c(546, 57, 910, 696, 214)
-  pids[i, "invalid"] <- responses[i, 2] %in% c(778, 957, 440, 963, 
+  pids[i, "invalid"] <- responses[i, 2] %in% c(778, 957, 440, 963, 63, 
                                              804, 381, 764, 97, 21, 228)
 }
 ```
@@ -113,10 +113,8 @@ socialsc <- aov(Social.Jibo ~ exp, data = pids)
 summary(socialsc)
 # p = .19, t = 1.34, means = 5.88, 4.7
 getMeanSD <- function(var){
-  print(mean(var[pids$exp == 1]))
-  print(sd(var[pids$exp == 1]))
-  print(mean(var[pids$exp == 0]))
-  print(sd(var[pids$exp == 0]))
+  print(paste("Mean, SD E:", mean(var[pids$exp == 1]), sd(var[pids$exp == 1])))
+  print(paste("Mean, SD C:", mean(var[pids$exp == 0]), sd(var[pids$exp == 0])))
 }
 
 getMeanSD(pids$Social.Jibo)
@@ -146,21 +144,31 @@ sd(pids$PA.hard)
 mean(pids$PA.easy)
 sd(pids$PA.easy)
 
-cor.test(pids$Social.Jibo, pids$PA.hard)
-summary(lm(formula = PA.hard ~ Social.Jibo, data = pids))
-# r = 0.29, B = 0.02, p = 0.10
-cor.test(pids$Social.Jibo, pids$PA.easy)
-summary(lm(formula = PA.easy ~ Social.Jibo, data = pids))
-# r = 0.39, B = 0.02, p = 0.03 SIGNIFICANT!
-plot(pids$Social.Jibo, pids$PA.easy, main = "easy PA score by Jibo Social rating", 
-     xlab = "Jibo Social rating", ylab = "average easy PA score")
-abline(a = 0.686, b = 0.021, col = "red")
-text("y = 0.021 + 0.686x", x = 3.5, y = 0.7, col = "red")
 
-summary(lm(formula = I((pids$PA.easy + pids$PA.hard)/2) ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, I((pids$PA.easy + pids$PA.hard)/2), main = "total PA score by Jibo Social rating", xlab = "Jibo Social rating", ylab = "total PA score")
-abline(a = 0.668, b = 0.02, col = "red")
-text("y = 0.668 + 0.002x", x = 3.5, y = .7, col = "red")
+plotCor <- function(mod, x, y, xlab, ylab){
+  coefs <- summary(mod)$coefficients
+  # y = a + bx
+  b = round(coefs[2, 1], 3)
+  a = round(coefs[1, 1], 3)
+  eq = paste0("y = ", a, " + ", b, "x, p = ", round(coefs[2, 4], 4))
+  plot(x, y, main = paste(ylab, "by", xlab), xlab = xlab, ylab = ylab, col = pids$invalid + 1, sub = eq)
+  abline(a = a, b = b, col = "red")
+}
+
+cor.test(pids$Social.Jibo, pids$PA.hard) # r = 0.29, B = 0.02, p = 0.10
+mod = lm(formula = PA.hard ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$PA.hard, "Jibo Social Scores", "Avg. Hard PA Scores")
+cor.test(pids$Social.Jibo, pids$PA.easy)
+
+mod = lm(formula = PA.easy ~ Social.Jibo, data = pids)
+summary(mod)
+# r = 0.39, B = 0.02, p = 0.03 SIGNIFICANT!
+plotCor(mod, pids$Social.Jibo, pids$PA.easy, "Jibo Social Scores", "Avg. Easy PA Scores")
+
+mod = lm(formula = I((pids$PA.easy + pids$PA.hard)/2) ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, I((pids$PA.easy + pids$PA.hard)/2), "Jibo Social Scores", "Avg. PA Scores")
 cor.test((pids$PA.easy + pids$PA.hard)/2, pids$Social.Jibo)
 
 # time: nothing significant
@@ -172,6 +180,27 @@ t.test((pids$PA.etime[pids$exp == 1] + pids$PA.htime[pids$exp == 1])/2,
 summary(lm(formula = PA.easy ~ Social.Jibo + jpn, data = pids))
 summary(lm(formula = I((pids$PA.easy + pids$PA.hard)/2) ~ Social.Jibo + jpn, data = pids))
 
+plotvar <- pids$Social.Jibo
+scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
+colnames(scoredf) <- c("mean", "sd")
+scoredf[1, ] <- c(mean(plotvar[pids$exp == 1]), sd(plotvar[pids$exp == 1]))
+scoredf[2, ] <- c(mean(plotvar[pids$exp == 0]), sd(plotvar[pids$exp == 0]))
+bp <- barplot(scoredf$mean, main = "Ratings of Jibo Sociality by Condition", 
+        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 7), sub = "(+-1 SD shown)")
+arrows(x0 = bp , y0 = min(scoredf$mean + scoredf$sd, 7.0), y1 = scoredf$mean - scoredf$sd, 
+       angle = 90, code = 3)
+
+plotmean95 <- function(plotvar, vartitle){
+  scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
+  colnames(scoredf) <- c("mean", "sd")
+  scoredf[1, ] <- c(mean(plotvar[pids$exp == 1]), sd(plotvar[pids$exp == 1]))
+  scoredf[2, ] <- c(mean(plotvar[pids$exp == 0]), sd(plotvar[pids$exp == 0]))
+  bp <- barplot(scoredf$mean, main = paste(vartitle, "by Condition"), 
+          names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 1), sub = "(+-1 SD shown)")
+  arrows(x0 = bp , y0 = scoredf$mean - scoredf$sd, y1 = min(scoredf$mean + scoredf$sd, 1.0), 
+         angle = 90, code = 3)
+}
+
 avgex = (pids$PA.hard[pids$exp == 1] + pids$PA.easy[pids$exp == 1])/2
 avgctrl = (pids$PA.hard[pids$exp == 0] + pids$PA.easy[pids$exp == 0])/2
 t.test(avgex, avgctrl)
@@ -179,27 +208,18 @@ scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
 colnames(scoredf) <- c("mean", "sd")
 scoredf[1, ] <- c(mean(avgex), sd(avgex))
 scoredf[2, ] <- c(mean(avgctrl), sd(avgctrl))
-bp <- barplot(scoredf$mean, main = "Average PA score by condition", 
+bp <- barplot(scoredf$mean, main = "Average PA Score by Condition", 
         names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 1))
-arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
+arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = max(scoredf$mean - scoredf$sd, 1.0), 
        angle = 90, code = 3)
 
 
 t.test(pids$PA.hard[pids$exp == 1], pids$PA.hard[pids$exp == 0])
-scoredf[1, ] <- c(mean(pids$PA.hard[pids$exp == 1]), sd(pids$PA.hard[pids$exp == 1]))
-scoredf[2, ] <- c(mean(pids$PA.hard[pids$exp == 0]), sd(pids$PA.hard[pids$exp == 0]))
-bp <- barplot(scoredf$mean, main = "Hard PA score by condition", 
-        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 1))
-arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
-       angle = 90, code = 3)
+plotmean95(pids$PA.hard, "Avg. Hard PA Score")
 
 t.test(pids$PA.easy[pids$exp == 1], pids$PA.easy[pids$exp == 0])
-scoredf[1, ] <- c(mean(pids$PA.easy[pids$exp == 1]), sd(pids$PA.easy[pids$exp == 1]))
-scoredf[2, ] <- c(mean(pids$PA.easy[pids$exp == 0]), sd(pids$PA.easy[pids$exp == 0]))
-bp <- barplot(scoredf$mean, main = "Easy PA score by condition", 
-        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 1))
-arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
-       angle = 90, code = 3)
+plotmean95(pids$PA.easy, "Avg. Easy PA Score")
+
 
 # hard pa tasks: exp vs. control
 t.test(pids$PA.hard[pids$exp == 1], pids$PA.hard[pids$exp == 0])
@@ -220,6 +240,8 @@ summary(aov(PA.htime ~ exp + age + male + BFI.extraversion + self.efficacy + emp
 
 WA analysis:
 ```{r}
+wordse <- rep(0, 6)
+wordsc <- rep(0, 6)
 for (i in 1:nrow(pids)){
   pid <- pids$PID[i]
   wafile <- filenames[grep(paste0("^", pid, "_wa"), filenames)]
@@ -231,38 +253,38 @@ for (i in 1:nrow(pids)){
                                c("kite", "scissors", "projector")])
   pids$WA.etime[i] <- mean(wafile$time[wafile$stimulus %in% 
                                c("rope", "ball", "wheel")])
+  if (isEven(pid))
+    wordse <- wordse + c(sum(wafile$stimulus == "kite"), sum(wafile$stimulus == "scissors"), sum(wafile$stimulus == "projector"), 
+                      sum(wafile$stimulus == "rope"), sum(wafile$stimulus == "ball"), sum(wafile$stimulus == "wheel"))
+  else
+    wordsc <- wordsc + c(sum(wafile$stimulus == "kite"), sum(wafile$stimulus == "scissors"), sum(wafile$stimulus == "projector"), 
+                     sum(wafile$stimulus == "rope"), sum(wafile$stimulus == "ball"), sum(wafile$stimulus == "wheel"))
 }
 
+mean(pids$WA.easy)
+sd(pids$WA.easy)
+mean(pids$WA.hard)
+sd(pids$WA.hard)
 t.test(pids$WA.easy, pids$WA.hard, paired = TRUE) 
 t.test(pids$WA.etime, pids$WA.htime, paired = TRUE) 
 
 cor.test(pids$Social.Jibo, pids$WA.hard)
-summary(lm(formula = WA.hard ~ Social.Jibo, data = pids))
-cor.test(pids$Social.Jibo, pids$WA.easy)
-summary(lm(formula = WA.easy ~ Social.Jibo, data = pids))
+mod <- lm(formula = WA.hard ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$WA.hard, "Jibo Social Scores", "Hard WA Scores")
+mod <- lm(formula = WA.easy ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$WA.easy, "Jibo Social Scores", "Easy WA Scores")
 
-plot(pids$Social.Jibo, pids$WA.easy, main = "easy WA score by Jibo Social rating", 
-     xlab = "Jibo Social rating", ylab = "easy WA score")
-abline(a = 29.475, b = -0.941, col = "red")
-text("y =  29.475 - 0.941x", x = 3.5, y = 28, col = "red")
-
-summary(lm(formula = WA.easy + WA.hard ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, pids$WA.easy + pids$WA.hard, main = "total WA score by Jibo Social rating", xlab = "Jibo Social rating", ylab = "total WA score")
-abline(a = 51.635, b = -0.869, col = "red")
-text("y =  51.635 - 0.869x", x = 3.5, y = 52, col = "red")
-
-summary(lm(formula = WA.etime ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, pids$WA.etime, main = "easy WA time by Jibo Social rating", xlab = "Jibo Social rating", ylab = "easy WA time")
-abline(a = 2.70, b = 0.113, col = "red")
-text("y =  2.70 - 0.113x", x = 3.5, y = 2.5, col = "red")
-
-summary(lm(formula = WA.htime ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, pids$WA.htime, main = "hard WA time by Jibo Social rating", xlab = "Jibo Social rating", ylab = "hard WA time")
-abline(a = 3.280, b = 0.062, col = "red")
-text("y =  3.280 + 0.062x", x = 3.5, y = 4, col = "red")
+mod <- lm(formula = WA.etime ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$WA.etime, "Jibo Social Scores", "Avg. Easy WA Times")
+mod <- lm(formula = WA.htime ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$WA.htime, "Jibo Social Scores", "Avg. Hard WA Times")
 
 summary(lm(formula = WA.htime + WA.etime ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, pids$WA.htime + pids$WA.etime, main = "total WA time by Jibo Social rating", xlab = "Jibo Social rating", ylab = "total WA time")
+plot(pids$Social.Jibo, pids$WA.htime + pids$WA.etime, main = "total WA time by Jibo Social rating", xlab = "Jibo Social rating", ylab = "total WA time", col = pids$invalid + 1, sub = "p = .08")
 abline(a = 5.979, b = 0.175, col = "red")
 text("y =  5.979 + 0.175x", x = 7, y = 8, col = "red")
 
@@ -275,11 +297,33 @@ summary(aov(WA.etime ~  exp + age + male + BFI.extraversion + self.efficacy + em
 # hard wa tasks: exp vs. control
 t.test(pids$WA.hard[pids$exp == 1], pids$WA.hard[pids$exp == 0])
 summary(aov(WA.hard ~ exp, data = pids)) #means = 23.00, 22.13
+getMeanSD(pids$WA.hard)
 summary(aov(WA.hard ~  exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
+
+plotvar = pids$WA.hard
+scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
+colnames(scoredf) <- c("mean", "sd")
+scoredf[1, ] <- c(mean(plotvar[pids$exp == 1]), sd(plotvar[pids$exp == 1]))
+scoredf[2, ] <- c(mean(plotvar[pids$exp == 0]), sd(plotvar[pids$exp == 0]))
+bp <- barplot(scoredf$mean, main = paste("Hard WA Scores", "by Condition"), 
+        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 30), sub = "(+-1 SD shown)")
+arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
+         angle = 90, code = 3)
+  
 # easy wa tasks: exp vs. control
 t.test(pids$WA.easy[pids$exp == 1], pids$WA.easy[pids$exp == 0])
 summary(aov(WA.easy ~ exp, data = pids)) #means = 23.88, 25.06
+getMeanSD(pids$WA.easy)
 summary(aov(WA.easy ~  exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
+plotvar = pids$WA.easy
+scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
+colnames(scoredf) <- c("mean", "sd")
+scoredf[1, ] <- c(mean(plotvar[pids$exp == 1]), sd(plotvar[pids$exp == 1]))
+scoredf[2, ] <- c(mean(plotvar[pids$exp == 0]), sd(plotvar[pids$exp == 0]))
+bp <- barplot(scoredf$mean, main = paste("Easy WA Scores", "by Condition"), 
+        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 35), sub = "(+-1 SD shown)")
+arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
+         angle = 90, code = 3)
 
 summary(aov(WA.easy + WA.hard ~  exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
 ```
@@ -289,8 +333,8 @@ RC analysis:
 questions = rep(0, 8)
 pids$RC.hread = rep(NA, nrow(pids))
 pids$RC.eread = rep(NA, nrow(pids))
-pids$RC.dif = rep(NA, nrow(pids))
-pids$RC.easy = rep(NA, nrow(pids))
+pids$RC.hard2 = rep(NA, nrow(pids))
+pids$RC.easy2 = rep(NA, nrow(pids))
 for (i in 1:nrow(pids)){
   pid <- pids$PID[i]
   rcfile <- filenames[grep(paste0("^", pid, "_rc2"), filenames)]
@@ -303,8 +347,8 @@ for (i in 1:nrow(pids)){
   pids$RC.htime[i] <- sum(rcfile$time[1:4])
   pids$RC.easy[i] <- mean(rcfile$correct[5:8])
   pids$RC.etime[i] <- sum(rcfile$time[5:8])
-  pids$RC.dif [i] <- mean(rcfile$correct[c(5, 7)])
-  pids$RC.easy[i] <- mean(rcfile$correct[2:4])
+  pids$RC.easy2[i] <- mean(rcfile$correct[c(5, 7)])
+  pids$RC.hard2[i] <- mean(rcfile$correct[2:4])
   questions = questions + rcfile$correct[1:8]
   pids$RC.hread[i] <- sum(readfile[readfile$article == "hard",]$time)
   pids$RC.eread[i] <- sum(readfile[readfile$article == "easy",]$time)
@@ -312,34 +356,64 @@ for (i in 1:nrow(pids)){
 
 questions # for 2 of the easy questions, almost nobody got it wrong
 
-cor(pids$Social.Jibo, pids$RC.hard)
-summary(lm(formula = RC.hard ~ Social.Jibo, data = pids))
-cor(pids$Social.Jibo, pids$RC.easy)
-summary(lm(formula = RC.easy ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, pids$RC.easy, main = "easy RC score by Jibo Social rating", 
-     xlab = "Jibo Social rating", ylab = "easy RC score")
-abline(a = 0.517, b = 0.028, col = "red")
-text("y = 0.517 + 0.028x", x = 7, y = 0.6, col = "red")
+cor.test(pids$Social.Jibo, pids$RC.hard)
+mod <- lm(formula = RC.hard ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$RC.hard, "Jibo Social Scores", "Hard RC Scores")
+cor.test(pids$Social.Jibo, pids$RC.easy)
+mod <- lm(formula = RC.easy ~ Social.Jibo, data = pids)
+summary(mod)
+plotCor(mod, pids$Social.Jibo, pids$RC.easy, "Jibo Social Scores", "Easy RC Scores")
+
+cor.test(pids$Social.Jibo, pids$RC.hard2)
+mod <- lm(formula = RC.hard2 ~ Social.Jibo, data = pids)
+summary(mod)
+cor.test(pids$Social.Jibo, pids$RC.easy2)
+mod <- lm(formula = RC.easy2 ~ Social.Jibo, data = pids)
+summary(mod)
+
+cor.test(pids$Social.Jibo, pids$RC.easy + pids$RC.hard)
+mod <- lm(formula = RC.easy + RC.hard ~ Social.Jibo, data = pids)
+summary(mod)
 
 summary(lm(formula = RC.easy + RC.hard ~ Social.Jibo, data = pids))
-plot(pids$Social.Jibo, pids$RC.easy + pids$RC.hard, main = "total RC score by Jibo Social rating", xlab = "Jibo Social rating", ylab = "total RC score")
+plot(pids$Social.Jibo, pids$RC.easy + pids$RC.hard, main = "total RC score by Jibo Social rating", xlab = "Jibo Social rating", ylab = "total RC score", sub = "p = .05", col = pids$invalid + 1)
 abline(a = 0.771, b = 0.046, col = "red")
 text("y = 0.771 + 0.046x", x = 7, y = 0.7, col = "red")
 
+cor.test(pids$Social.Jibo, pids$RC.hread)
 summary(lm(formula = RC.hread ~ Social.Jibo, data = pids))
+cor.test(pids$Social.Jibo, pids$RC.eread)
 summary(lm(formula = RC.eread ~ Social.Jibo, data = pids))
+cor.test(pids$Social.Jibo, pids$RC.htime)
 summary(lm(formula = RC.htime ~ Social.Jibo, data = pids))
+cor.test(pids$Social.Jibo, pids$RC.etime)
 summary(lm(formula = RC.etime ~ Social.Jibo, data = pids))
 
+t.test(pids$RC.hard, pids$RC.easy, paired = TRUE)
+mean(pids$RC.hard)
+sd(pids$RC.hard)
+mean(pids$RC.easy)
+sd(pids$RC.easy)
+
+t.test(pids$RC.hread, pids$RC.eread, paired = TRUE)
+mean(pids$RC.hread)
+sd(pids$RC.hread)
+mean(pids$RC.eread)
+sd(pids$RC.eread)
 
 # hard rc tasks: exp vs. control
 t.test(pids$RC.hard[pids$exp == 1], pids$RC.hard[pids$exp == 0])
 summary(aov(RC.hard ~ exp, data = pids))
 summary(aov(RC.hard ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
+getMeanSD(pids$RC.hard)
+plotmean95(pids$RC.hard, "Avg. Hard RC Score")
 # easy rc tasks: exp vs. control
 t.test(pids$RC.easy[pids$exp == 1], pids$RC.easy[pids$exp == 0])
 summary(aov(RC.easy ~ exp, data = pids))
 summary(aov(RC.easy ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
+getMeanSD(pids$RC.easy)
+plotmean95(pids$RC.easy, "Avg. Easy RC Score")
 
 # time spent:
 # hard pa tasks: exp vs. control
@@ -356,10 +430,30 @@ summary(aov(RC.etime ~ exp + age + male + BFI.extraversion + self.efficacy + emp
 t.test(pids$RC.eread[pids$exp == 1], pids$RC.eread[pids$exp == 0])
 summary(aov(RC.eread ~ exp, data = pids))
 summary(aov(RC.eread ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
+getMeanSD(pids$RC.eread)
+plotvar = pids$RC.eread
+scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
+colnames(scoredf) <- c("mean", "sd")
+scoredf[1, ] <- c(mean(plotvar[pids$exp == 1]), sd(plotvar[pids$exp == 1]))
+scoredf[2, ] <- c(mean(plotvar[pids$exp == 0]), sd(plotvar[pids$exp == 0]))
+bp <- barplot(scoredf$mean, main = paste("Time Reading Easy Article", "by Condition"), 
+        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 155), sub = "(+-1 SD shown)")
+arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
+         angle = 90, code = 3)
 
 t.test(pids$RC.hread[pids$exp == 1], pids$RC.hread[pids$exp == 0])
 summary(aov(RC.hread ~ exp, data = pids))
 summary(aov(RC.hread ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = pids))
+getMeanSD(pids$RC.hread)
+plotvar = pids$RC.hread
+scoredf <- as.data.frame(matrix(nrow = 2, ncol = 2))
+colnames(scoredf) <- c("mean", "sd")
+scoredf[1, ] <- c(mean(plotvar[pids$exp == 1]), sd(plotvar[pids$exp == 1]))
+scoredf[2, ] <- c(mean(plotvar[pids$exp == 0]), sd(plotvar[pids$exp == 0]))
+bp <- barplot(scoredf$mean, main = paste("Time Reading Hard Article", "by Condition"), 
+        names.arg = c("Experimental", "Control"), col = 4:2, ylim = c(0, 220), sub = "(+-1 SD shown)")
+arrows(x0 = bp , y0 = scoredf$mean + scoredf$sd, y1 = scoredf$mean - scoredf$sd, 
+         angle = 90, code = 3)
 ```
 
 Redoing all of the tests with "valid" (Jibo didn't turn off) PIDS
@@ -373,8 +467,6 @@ remPIDS = function(remlist){
 validpids = remPIDS(invalidpids)
 summary(lm(formula = PA.easy ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure + jpn, data = validpids))
 summary(lm(formula = PA.hard ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure + jpn, data = validpids))
-summary(lm(formula = PA.etime ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure + jpn, data = validpids))
-summary(lm(formula = PA.htime ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure + jpn, data = validpids))
 summary(lm(formula = WA.easy ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = validpids))
 summary(lm(formula = WA.hard ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = validpids))
 summary(lm(formula = WA.etime ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = validpids))
@@ -385,5 +477,6 @@ summary(lm(formula = RC.etime ~ exp + age + male + BFI.extraversion + self.effic
 summary(lm(formula = RC.htime ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = validpids))
 summary(lm(formula = RC.eread ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = validpids))
 summary(lm(formula = RC.hread ~ exp + age + male + BFI.extraversion + self.efficacy + empathy + cs1 + cs2 + cs3 + cs4 + rExposure, data = validpids))
+
 ```
 
