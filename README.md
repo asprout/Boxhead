@@ -28,7 +28,8 @@ Specifically, we are interested in whether the sociality of the robot influences
   - Participants asked to answer multiple choice questions based on given articles 
   - HARD: the given article is more esoteric and uses more high-level vocabulary; 5 multiple-choice responses are given instead of 4.
 
-  
+### Results
+We found that in the paired association task, participants in the experimental condition performed significantly better than participants in the control condition in both the easy and difficult tasks. We believe this is an exciting finding, as the presence of even simple domain-general social robots may be used to improve human performance, even in learning tasks. Refer to the materials in the Report folder for more details.
 
 ## Deliverables
 ### 10/12
