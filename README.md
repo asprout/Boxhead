@@ -3,7 +3,7 @@ Project repository for HRI project in Intelligent Robotics Lab.
 The goal of this project is to investigate if and how robots elicit the social facilitation effect in humans.
 Specifically, we are interested in whether the sociality of the robot influences the performance of the participant.
 ### Manipulation: the Sociality of Jibo
-  - In both conditions, Jibo is placed to the right of (and a little behind) the desktop the participant is asked to use, and performs passive movement and ESML behaviors.
+  - In both conditions, Jibo is placed to the right of (and a little behind) the desktop the participant is asked to use, and performs passive movement and ESML (embodied speech) behaviors.
 #### Experimental Condition:
   - INTRO: The participant is introduced to Jibo and added to Jibo's loop with the help of the experimenter. 
   - Jibo is facing in the general direction of the participant. 
@@ -27,6 +27,7 @@ Specifically, we are interested in whether the sociality of the robot influences
 #### Reading Comprehension
   - Participants asked to answer multiple choice questions based on given articles 
   - HARD: the given article is more esoteric and uses more high-level vocabulary; 5 multiple-choice responses are given instead of 4.
+
   
 
 ## Deliverables
@@ -46,12 +47,12 @@ Specifically, we are interested in whether the sociality of the robot influences
 ### 12/03
   - [x] Run participants
   - [x] Data analysis
-  - [ ] Final report 
+  - [x] Final report 
   
 ## Code Documentation:
 ### Jibo code
-The code for the Jibo app is located at Boxhead/app/src/main/java/com/example/android/boxhead/MainActivity.kt
-To run it, you will need to install Android Studio and open the Boxhead app (which consists of everything in this repository but the psychopy folder), and then click 'run'. The app has been designed for a Samsung Galaxy Tab A tablet; it will work on other android devices, but may look different than intended.
+The code we developed for the Jibo app is located at Boxhead/app/src/main/java/com/example/android/boxhead/MainActivity.kt
+To run it, you will need to install Android Studio and open the Boxhead app (which consists of everything in this repository but the psychopy and Report folders), and then click 'run'. The app has been designed for a Samsung Galaxy Tab A tablet; it will work on other android devices, but may look different than intended.
 It is commented with explanations as to the purpose of each part, but please email one of the repository owners if you have any questions.
   
 ### Tasks code
@@ -59,5 +60,6 @@ The code for the performance tasks used for our experiment is at Boxhead/psychop
 Please read the readme in the psychopy folder, and again feel free to contact us with any questions.
 
 ## Member Contributions:
-Both members worked on the materials for the IRB, and designing the experiment, e.g. the performance tasks and formalizing the robot identities. Both members equally participated in recruiting and running participants, and in creating the various slides. 
-Ling was responsible for writing the code for the Jibo app, and gathering survey measures in creating the experimental questionnaire. She was also in charge of the data analysis (R code), and the write-up of the final report. Ling was also the finance manager of this team. Nathan worked on the code for the performance tasks used for the experiment. He was also responsible for the formatting of the final report, and was the primary contributer for the methodology and conclusion sections. 
+Both members worked on the materials for the IRB and designing the experiment, e.g. the performance tasks and formalizing the robot identities. Both members equally participated in recruiting and running participants, and in creating the various presentations throughout the semester.
+Ling was responsible for writing the code for Jibo and the tablet app, and material such as the participant debriefing forms, posters, and the experimental questionnaire (e.g. survey measures). She was also in charge of the data analysis (R code), and the write-up of the final report. Ling was also the finance manager of this team. 
+Nathan worked on the code for the performance tasks used for the experiment. He was also responsible for the formatting of the final report, and was the primary contributer for the methodology and conclusion sections. 
