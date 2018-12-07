@@ -59,4 +59,5 @@ The code for the performance tasks used for our experiment is at Boxhead/psychop
 Please read the readme in the psychopy folder, and again feel free to contact us with any questions.
 
 ## Member Contributions:
-Ling worked on the code for the Jibo app. Nathan worked on the code for the performance tasks used for the experiment. Both members worked on the materials for the IRB, designing the performance tasks, and formalizing the robot identities. Both members participated in recuriting and running participants. Both members contributed to the check-in slides and the materials for the final report. 
+Both members worked on the materials for the IRB, and designing the experiment, e.g. the performance tasks and formalizing the robot identities. Both members equally participated in recruiting and running participants, and in creating the various slides. 
+Ling was responsible for writing the code for the Jibo app, and gathering survey measures in creating the experimental questionnaire. She was also in charge of the data analysis (R code), and the write-up of the final report. Ling was also the finance manager of this team. Nathan worked on the code for the performance tasks used for the experiment. He was also responsible for the formatting of the final report, and was the primary contributer for the methodology and conclusion sections. 
