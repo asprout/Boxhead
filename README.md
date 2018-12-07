@@ -58,3 +58,5 @@ It is commented with explanations as to the purpose of each part, but please ema
 The code for the performance tasks used for our experiment is at Boxhead/psychopy/tasks.py
 Please read the readme in the psychopy folder, and again feel free to contact us with any questions.
 
+## Member Contributions:
+Ling worked on the code for the Jibo app. Nathan worked on the code for the performance tasks used for the experiment. Both members worked on the materials for the IRB, designing the performance tasks, and formalizing the robot identities. Both members participated in recuriting and running participants. Both members contributed to the check-in slides and the materials for the final report. 
